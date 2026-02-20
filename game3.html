@@ -1,0 +1,2547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Blackjack Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            touch-action: manipulation;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .logo {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 1px;
+            animation: logoGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes logoGlow {
+            0%, 100% { 
+                text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            }
+            50% { 
+                text-shadow: 0 0 20px rgba(255, 215, 0, 0.9);
+            }
+        }
+
+        .balance-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 8px 14px;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .chip-icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: #1a1a2e;
+        }
+
+        .balance-amount {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #ffd700;
+            min-width: 80px;
+        }
+
+        .game-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            gap: 8px;
+        }
+
+        .timer-display {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            padding: 8px;
+            background: rgba(255, 215, 0, 0.15);
+            border-radius: 8px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            color: #ffd700;
+            margin-bottom: 5px;
+            display: none;
+        }
+
+        .timer-display.visible {
+            display: block;
+            animation: timerPulse 0.5s ease-in-out;
+        }
+
+        @keyframes timerPulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .timer-display.warning {
+            background: rgba(255, 107, 107, 0.15);
+            border-color: rgba(255, 107, 107, 0.5);
+            color: #ff6b6b;
+            animation: timerWarning 0.3s ease-in-out infinite;
+        }
+
+        @keyframes timerWarning {
+            0%, 100% {
+                box-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(255, 107, 107, 0.6);
+            }
+        }
+
+        .hand-area {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 12px;
+            min-height: 130px;
+        }
+
+        .area-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .area-title {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .hand-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .hand-value.visible {
+            opacity: 1;
+        }
+
+        .hand-value.dealer-value {
+            color: #ff6b6b;
+        }
+
+        .hand-value.player-value {
+            color: #51cf66;
+        }
+
+        .cards-container {
+            display: flex;
+            gap: 6px;
+            min-height: 75px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            width: 52px;
+            height: 74px;
+            background: #ffffff;
+            border-radius: 6px;
+            position: relative;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+
+        .card.dealing {
+            animation: dealCard 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes dealCard {
+            0% {
+                transform: translateY(-150px) rotate(-15deg) scale(0.5);
+                opacity: 0;
+            }
+            60% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(0) rotate(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .card.blackjack-animation {
+            animation: blackjackGlow 0.8s ease-out;
+        }
+
+        @keyframes blackjackGlow {
+            0% {
+                transform: scale(0.8);
+                box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.8);
+            }
+            50% {
+                transform: scale(1.1);
+                box-shadow: 0 0 20px 10px rgba(255, 215, 0, 0.4);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 20px 0 rgba(255, 215, 0, 0);
+            }
+        }
+
+        .card.bust-animation {
+            animation: bustCard 0.6s ease-out forwards;
+        }
+
+        @keyframes bustCard {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(-20px) scale(1.1) rotate(5deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) scale(0.5) rotate(-10deg);
+            }
+        }
+
+        .card.flipping {
+            animation: flipCard 0.5s ease-in-out forwards;
+        }
+
+        @keyframes flipCard {
+            0% {
+                transform: rotateY(90deg);
+            }
+            100% {
+                transform: rotateY(0);
+            }
+        }
+
+        .card.back {
+            background: linear-gradient(135deg, #1e3a5f 0%, #0d1b2a 100%);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .card.back::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            bottom: 8px;
+            border: 2px solid rgba(255, 215, 0, 0.2);
+            border-radius: 4px;
+        }
+
+        .card.back::after {
+            content: '♠♥♦♣';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.9rem;
+            color: rgba(255, 215, 0, 0.4);
+            letter-spacing: 2px;
+        }
+
+        .card-inner {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 5px;
+        }
+
+        .card-corner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 1;
+        }
+
+        .card-corner.bottom {
+            transform: rotate(180deg);
+        }
+
+        .card-rank {
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        .card-suit-small {
+            font-size: 0.85rem;
+        }
+
+        .card-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.6rem;
+        }
+
+        .card.red .card-rank,
+        .card.red .card-suit-small,
+        .card.red .card-center {
+            color: #c92a2a;
+        }
+
+        .card.black .card-rank,
+        .card.black .card-suit-small,
+        .card.black .card-center {
+            color: #212529;
+        }
+
+        .betting-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: auto;
+        }
+
+        .bet-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .bet-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .bet-amount {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #ffd700;
+        }
+
+        .bet-input-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .bet-input {
+            flex: 1;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 6px;
+            color: #ffd700;
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .bet-input:focus {
+            outline: none;
+            border-color: #ffd700;
+        }
+
+        .set-bet-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #ffd700, #fab005);
+            border: none;
+            border-radius: 6px;
+            color: #1a1a2e;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .set-bet-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .quick-btn {
+            flex: 1;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            color: #ffffff;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .quick-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .quick-btn:active {
+            transform: scale(0.95);
+        }
+
+        .chip-rack {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .chip-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 255, 255, 0.25);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+
+        .chip-btn::before {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            border-radius: 50%;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+        }
+
+        .chip-btn:hover:not(:disabled) {
+            transform: scale(1.1);
+        }
+
+        .chip-btn:active:not(:disabled) {
+            transform: scale(0.95);
+            animation: coinDrop 0.4s ease-out;
+        }
+
+        @keyframes coinDrop {
+            0% {
+                transform: scale(0.95) translateY(0);
+            }
+            50% {
+                transform: scale(1) translateY(-10px) rotateZ(10deg);
+            }
+            100% {
+                transform: scale(0.95) translateY(0) rotateZ(0deg);
+            }
+        }
+
+        .chip-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .chip-red { background: linear-gradient(135deg, #ff6b6b, #ee5a5a); }
+        .chip-green { background: linear-gradient(135deg, #51cf66, #40c057); }
+        .chip-blue { background: linear-gradient(135deg, #339af0, #228be6); }
+        .chip-black { background: linear-gradient(135deg, #495057, #343a40); }
+        .chip-gold { background: linear-gradient(135deg, #ffd700, #fab005); }
+
+        .chip-value {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #ffffff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .chip-symbol {
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .deal-btn {
+            width: 100%;
+            padding: 14px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #51cf66, #40c057);
+            color: #ffffff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(64, 192, 87, 0.4);
+        }
+
+        .deal-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(64, 192, 87, 0.5);
+        }
+
+        .deal-btn:disabled {
+            background: linear-gradient(135deg, #868e96, #495057);
+            opacity: 0.5;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .action-buttons {
+            display: none;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .action-buttons.visible {
+            display: flex;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 14px 10px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .action-btn i {
+            font-size: 1.2rem;
+        }
+
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .action-btn.hit {
+            background: linear-gradient(135deg, #339af0, #228be6);
+            color: #ffffff;
+        }
+
+        .action-btn.stand {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+            color: #ffffff;
+        }
+
+        .action-btn.double {
+            background: linear-gradient(135deg, #ffd700, #fab005);
+            color: #1a1a2e;
+        }
+
+        .action-btn.split {
+            background: linear-gradient(135deg, #9775fa, #845ef7);
+            color: #ffffff;
+        }
+
+        .action-btn:active:not(:disabled) {
+            transform: scale(0.95);
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #212529, #343a40);
+            padding: 25px 30px;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 320px;
+            width: 90%;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            animation: bounceIcon 0.6s ease-out;
+        }
+
+        @keyframes bounceIcon {
+            0% {
+                transform: scale(0) rotateZ(0deg);
+                opacity: 0;
+            }
+            60% {
+                transform: scale(1.2) rotateZ(10deg);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1) rotateZ(0deg);
+                opacity: 1;
+            }
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .modal-text {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .modal-btn {
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #ffd700, #fab005);
+            color: #1a1a2e;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modal-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .insurance-btns {
+            display: flex;
+            gap: 10px;
+        }
+
+        .insurance-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .insurance-btn.yes {
+            background: linear-gradient(135deg, #51cf66, #40c057);
+            color: #ffffff;
+        }
+
+        .insurance-btn.no {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .history-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #ffd700, #fab005);
+            border: none;
+            border-radius: 50%;
+            color: #1a1a2e;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .history-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .history-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            z-index: 1500;
+            animation: slideInRight 0.3s ease;
+        }
+
+        .history-panel.show {
+            display: block;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .history-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #ffd700;
+        }
+
+        .close-btn {
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            color: #ffffff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .history-body {
+            padding: 15px;
+            max-height: calc(100vh - 70px);
+            overflow-y: auto;
+        }
+
+        .history-stats {
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            text-align: center;
+        }
+
+        .stat-item {
+            padding: 10px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .history-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid transparent;
+        }
+
+        .history-item.win { border-left-color: #51cf66; }
+        .history-item.loss { border-left-color: #ff6b6b; }
+        .history-item.push { border-left-color: #ffd700; }
+
+        .history-result-name {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .history-result-details {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .history-result-amount {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .history-result-amount.positive { color: #51cf66; }
+        .history-result-amount.negative { color: #ff6b6b; }
+        .history-result-amount.zero { color: #ffd700; }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: rgba(255, 215, 0, 0.3);
+        }
+
+        .floating-text {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2.5rem;
+            font-weight: 800;
+            pointer-events: none;
+            z-index: 2000;
+            animation: floatUp 1.5s ease-out forwards;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        @keyframes floatUp {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            20% {
+                opacity: 1;
+                transform: translate(-50%, -70%) scale(1.2);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -150%) scale(1);
+            }
+        }
+
+        .split-hands {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .split-hand {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .split-hand.active {
+            border: 2px solid #ffd700;
+        }
+
+        .split-hand-title {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        .bust-text {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            font-size: 4rem;
+            font-weight: 900;
+            color: #ff6b6b;
+            pointer-events: none;
+            z-index: 2000;
+            animation: bustShake 0.6s ease-out forwards;
+            text-shadow: 0 0 20px rgba(255, 107, 107, 0.8);
+        }
+
+        @keyframes bustShake {
+            0% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(0.5) rotateZ(0deg);
+            }
+            25% {
+                transform: translate(-40%, -50%) scale(1.2) rotateZ(-5deg);
+            }
+            50% {
+                transform: translate(-60%, -50%) scale(1.2) rotateZ(5deg);
+            }
+            75% {
+                transform: translate(-50%, -40%) scale(1.1) rotateZ(-3deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -70%) scale(0.3) rotateZ(0deg);
+            }
+        }
+
+        @media (max-width: 360px) {
+            .chip-btn {
+                width: 46px;
+                height: 46px;
+            }
+            .chip-value {
+                font-size: 0.75rem;
+            }
+            .card {
+                width: 46px;
+                height: 66px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">♠ BLACKJACK ♥</div>
+        <div class="balance-container">
+            <div class="chip-icon">$</div>
+            <span class="balance-amount" id="balance">1000</span>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <div class="timer-display" id="timer-display">
+            ⏱️ Time: <span id="timer-text">15</span>s
+        </div>
+
+        <div class="hand-area">
+            <div class="area-header">
+                <span class="area-title">Dealer</span>
+                <span class="hand-value dealer-value" id="dealer-value">0</span>
+            </div>
+            <div class="cards-container" id="dealer-cards"></div>
+        </div>
+
+        <div class="hand-area" id="player-area">
+            <div class="area-header">
+                <span class="area-title">Your Hand</span>
+                <span class="hand-value player-value" id="player-value">0</span>
+            </div>
+            <div class="cards-container" id="player-cards"></div>
+        </div>
+
+        <div class="betting-section" id="betting-section">
+            <div class="bet-info">
+                <span class="bet-label">Current Bet</span>
+                <span class="bet-amount" id="current-bet">0</span>
+            </div>
+
+            <div class="bet-input-container">
+                <input type="number" class="bet-input" id="bet-input" placeholder="Enter bet (min 20)" min="20" step="10">
+                <button class="set-bet-btn" id="set-bet-btn">Set Bet</button>
+            </div>
+
+            <div class="quick-actions">
+                <button class="quick-btn" data-action="clear">Clear</button>
+                <button class="quick-btn" data-action="half">Half</button>
+                <button class="quick-btn" data-action="all-in">All In</button>
+            </div>
+
+            <div class="chip-rack">
+                <button class="chip-btn chip-red" data-bet="20">
+                    <span class="chip-value">20</span>
+                    <span class="chip-symbol">♦</span>
+                </button>
+                <button class="chip-btn chip-green" data-bet="50">
+                    <span class="chip-value">50</span>
+                    <span class="chip-symbol">♠</span>
+                </button>
+                <button class="chip-btn chip-blue" data-bet="100">
+                    <span class="chip-value">100</span>
+                    <span class="chip-symbol">♣</span>
+                </button>
+                <button class="chip-btn chip-black" data-bet="250">
+                    <span class="chip-value">250</span>
+                    <span class="chip-symbol">♥</span>
+                </button>
+                <button class="chip-btn chip-gold" data-bet="500">
+                    <span class="chip-value">500</span>
+                    <span class="chip-symbol">★</span>
+                </button>
+            </div>
+
+            <button class="deal-btn" id="deal-btn" disabled>Deal Cards</button>
+        </div>
+
+        <div class="action-buttons" id="action-buttons">
+            <button class="action-btn hit" id="hit-btn">
+                <i class="fas fa-plus"></i>
+                Hit
+            </button>
+            <button class="action-btn stand" id="stand-btn">
+                <i class="fas fa-hand-paper"></i>
+                Stand
+            </button>
+            <button class="action-btn double" id="double-btn">
+                <i class="fas fa-times"></i>
+                Double
+            </button>
+            <button class="action-btn split" id="split-btn">
+                <i class="fas fa-object-ungroup"></i>
+                Split
+            </button>
+        </div>
+    </div>
+
+    <div class="modal" id="insurance-modal">
+        <div class="modal-content">
+            <div class="modal-icon">🛡️</div>
+            <div class="modal-title">Insurance?</div>
+            <div class="modal-text">
+                Dealer shows an Ace.<br>
+                Insurance costs half your bet.<br>
+                Pays 2:1 if dealer has Blackjack.
+            </div>
+            <div class="insurance-btns">
+                <button class="insurance-btn yes" id="insurance-yes">Yes</button>
+                <button class="insurance-btn no" id="insurance-no">No</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="result-modal">
+        <div class="modal-content">
+            <div class="modal-icon" id="result-icon"></div>
+            <div class="modal-title" id="result-title"></div>
+            <div class="modal-text" id="result-text"></div>
+            <button class="modal-btn" id="result-btn">Continue</button>
+        </div>
+    </div>
+
+    <button class="history-btn" id="history-btn">
+        <i class="fas fa-history"></i>
+    </button>
+
+    <div class="history-panel" id="history-panel">
+        <div class="history-header">
+            <span class="history-title">Game History</span>
+            <button class="close-btn" id="close-history">×</button>
+        </div>
+        <div class="history-body" id="history-body"></div>
+    </div>
+
+<script>
+class BlackjackGame {
+    constructor() {
+        this.config = {
+            initialBalance: 1000,
+            minBet: 20,
+            chipValues: [20, 50, 100, 250, 500],
+            dealerStandValue: 17,
+            cardDealDelay: 600,
+            cardFlipDelay: 800,
+            dealerTurnDelay: 1000,
+            playingTimeLimit: 15
+        };
+
+        this.state = {
+            balance: this.config.initialBalance,
+            currentBet: 0,
+            deck: [],
+            dealerHand: [],
+            playerHands: [[]],
+            currentHandIndex: 0,
+            phase: 'betting',
+            insuranceBet: 0,
+            hasInsurance: false,
+            gameHistory: [],
+            isSplit: false,
+            handBets: [],
+            timerInterval: null,
+            timeRemaining: this.config.playingTimeLimit
+        };
+
+        this.cardElements = {
+            dealer: [],
+            player: [[]]
+        };
+
+        this.initAudio();
+        this.initializeDeck();
+        this.cacheDOM();
+        this.bindEvents();
+        this.updateUI();
+    }
+
+    initAudio() {
+        try {
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        } catch (e) {
+            console.log('Web Audio API not supported');
+            this.audioContext = null;
+        }
+    }
+
+    playSound(type) {
+        if (!this.audioContext) return;
+
+        const ctx = this.audioContext;
+        const now = ctx.currentTime;
+
+        try {
+            switch(type) {
+                case 'card':
+                    this.playCardDealSound(ctx, now);
+                    break;
+                case 'coin':
+                    this.playCoinSound(ctx, now);
+                    break;
+                case 'hit':
+                    this.playHitSound(ctx, now);
+                    break;
+                case 'stand':
+                    this.playStandSound(ctx, now);
+                    break;
+                case 'double':
+                    this.playDoubleSound(ctx, now);
+                    break;
+                case 'split':
+                    this.playSplitSound(ctx, now);
+                    break;
+                case 'bust':
+                    this.playBustSound(ctx, now);
+                    break;
+                case 'win':
+                    this.playWinSound(ctx, now);
+                    break;
+                case 'blackjack':
+                    this.playBlackjackSound(ctx, now);
+                    break;
+                case 'flip':
+                    this.playFlipSound(ctx, now);
+                    break;
+                case 'betting':
+                    this.playBettingSound(ctx, now);
+                    break;
+            }
+        } catch (e) {
+            console.log('Sound error:', e);
+        }
+    }
+
+    playCardDealSound(ctx, now) {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(800, now);
+        osc.frequency.exponentialRampToValueAtTime(300, now + 0.15);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+        
+        osc.start(now);
+        osc.stop(now + 0.15);
+    }
+
+    playCoinSound(ctx, now) {
+        const osc1 = ctx.createOscillator();
+        const osc2 = ctx.createOscillator();
+        const gain1 = ctx.createGain();
+        const gain2 = ctx.createGain();
+        
+        osc1.connect(gain1);
+        osc2.connect(gain2);
+        gain1.connect(ctx.destination);
+        gain2.connect(ctx.destination);
+
+        osc1.type = 'sine';
+        osc2.type = 'sine';
+        
+        osc1.frequency.setValueAtTime(800, now);
+        osc1.frequency.exponentialRampToValueAtTime(400, now + 0.1);
+        
+        osc2.frequency.setValueAtTime(1000, now);
+        osc2.frequency.exponentialRampToValueAtTime(500, now + 0.1);
+        
+        gain1.gain.setValueAtTime(0.15, now);
+        gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+        gain2.gain.setValueAtTime(0.1, now);
+        gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+        
+        osc1.start(now);
+        osc1.stop(now + 0.3);
+        osc2.start(now + 0.05);
+        osc2.stop(now + 0.3);
+    }
+
+    playHitSound(ctx, now) {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, now);
+        osc.frequency.linearRampToValueAtTime(700, now + 0.1);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+        
+        osc.start(now);
+        osc.stop(now + 0.15);
+    }
+
+    playStandSound(ctx, now) {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(400, now);
+        osc.frequency.linearRampToValueAtTime(500, now + 0.15);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+        
+        osc.start(now);
+        osc.stop(now + 0.2);
+    }
+
+    playDoubleSound(ctx, now) {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(700, now);
+        osc.frequency.setValueAtTime(500, now + 0.08);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.setValueAtTime(0.2, now + 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+        
+        osc.start(now);
+        osc.stop(now + 0.25);
+    }
+
+    playSplitSound(ctx, now) {
+        const osc1 = ctx.createOscillator();
+        const osc2 = ctx.createOscillator();
+        const gain1 = ctx.createGain();
+        const gain2 = ctx.createGain();
+        
+        osc1.connect(gain1);
+        osc2.connect(gain2);
+        gain1.connect(ctx.destination);
+        gain2.connect(ctx.destination);
+
+        osc1.type = 'sine';
+        osc2.type = 'sine';
+        
+        osc1.frequency.setValueAtTime(400, now);
+        osc1.frequency.linearRampToValueAtTime(600, now + 0.2);
+        
+        osc2.frequency.setValueAtTime(600, now);
+        osc2.frequency.linearRampToValueAtTime(800, now + 0.2);
+        
+        gain1.gain.setValueAtTime(0.15, now);
+        gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+        gain2.gain.setValueAtTime(0.1, now);
+        gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+        
+        osc1.start(now);
+        osc1.stop(now + 0.2);
+        osc2.start(now);
+        osc2.stop(now + 0.2);
+    }
+
+    playBustSound(ctx, now) {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(800, now);
+        osc.frequency.exponentialRampToValueAtTime(100, now + 0.5);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+        
+        osc.start(now);
+        osc.stop(now + 0.5);
+    }
+
+    playWinSound(ctx, now) {
+        const osc1 = ctx.createOscillator();
+        const osc2 = ctx.createOscillator();
+        const gain1 = ctx.createGain();
+        const gain2 = ctx.createGain();
+        
+        osc1.connect(gain1);
+        osc2.connect(gain2);
+        gain1.connect(ctx.destination);
+        gain2.connect(ctx.destination);
+
+        osc1.type = 'sine';
+        osc2.type = 'sine';
+        
+        osc1.frequency.setValueAtTime(523.25, now);
+        osc1.frequency.setValueAtTime(659.25, now + 0.1);
+        osc1.frequency.setValueAtTime(783.99, now + 0.2);
+        
+        osc2.frequency.setValueAtTime(659.25, now + 0.05);
+        osc2.frequency.setValueAtTime(783.99, now + 0.15);
+        osc2.frequency.setValueAtTime(987.77, now + 0.25);
+        
+        gain1.gain.setValueAtTime(0.2, now);
+        gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+        gain2.gain.setValueAtTime(0.15, now);
+        gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+        
+        osc1.start(now);
+        osc1.stop(now + 0.4);
+        osc2.start(now + 0.05);
+        osc2.stop(now + 0.4);
+    }
+
+    playBlackjackSound(ctx, now) {
+        const osc1 = ctx.createOscillator();
+        const osc2 = ctx.createOscillator();
+        const osc3 = ctx.createOscillator();
+        const gain1 = ctx.createGain();
+        const gain2 = ctx.createGain();
+        const gain3 = ctx.createGain();
+        
+        osc1.connect(gain1);
+        osc2.connect(gain2);
+        osc3.connect(gain3);
+        gain1.connect(ctx.destination);
+        gain2.connect(ctx.destination);
+        gain3.connect(ctx.destination);
+
+        osc1.type = 'sine';
+        osc2.type = 'sine';
+        osc3.type = 'sine';
+        
+        osc1.frequency.setValueAtTime(523.25, now);
+        osc2.frequency.setValueAtTime(659.25, now);
+        osc3.frequency.setValueAtTime(783.99, now);
+        
+        gain1.gain.setValueAtTime(0.2, now);
+        gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+        gain2.gain.setValueAtTime(0.15, now);
+        gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+        gain3.gain.setValueAtTime(0.15, now);
+        gain3.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+        
+        osc1.start(now);
+        osc1.stop(now + 0.6);
+        osc2.start(now);
+        osc2.stop(now + 0.6);
+        osc3.start(now);
+        osc3.stop(now + 0.6);
+    }
+
+    playFlipSound(ctx, now) {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(800, now);
+        osc.frequency.linearRampToValueAtTime(600, now + 0.1);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+        
+        osc.start(now);
+        osc.stop(now + 0.15);
+    }
+
+    playBettingSound(ctx, now) {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(900, now);
+        osc.frequency.exponentialRampToValueAtTime(700, now + 0.12);
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+        
+        osc.start(now);
+        osc.stop(now + 0.12);
+    }
+
+    startPlayingTimer() {
+        this.state.timeRemaining = this.config.playingTimeLimit;
+        this.dom.timerDisplay.classList.add('visible');
+        this.dom.timerDisplay.classList.remove('warning');
+
+        if (this.state.timerInterval) {
+            clearInterval(this.state.timerInterval);
+        }
+
+        this.state.timerInterval = setInterval(() => {
+            this.state.timeRemaining--;
+            this.dom.timerText.textContent = this.state.timeRemaining;
+
+            if (this.state.timeRemaining <= 5) {
+                this.dom.timerDisplay.classList.add('warning');
+            }
+
+            if (this.state.timeRemaining <= 0) {
+                clearInterval(this.state.timerInterval);
+                this.dom.timerDisplay.classList.remove('visible');
+                if (this.state.phase === 'playing') {
+                    this.stand();
+                }
+            }
+        }, 1000);
+    }
+
+    initializeDeck() {
+        const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
+        const ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+        
+        this.state.deck = [];
+        for (let i = 0; i < 6; i++) {
+            for (const suit of suits) {
+                for (const rank of ranks) {
+                    this.state.deck.push({ suit, rank });
+                }
+            }
+        }
+        this.shuffleDeck();
+    }
+
+    shuffleDeck() {
+        for (let i = this.state.deck.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [this.state.deck[i], this.state.deck[j]] = [this.state.deck[j], this.state.deck[i]];
+        }
+    }
+
+    drawCard() {
+        if (this.state.deck.length < 20) {
+            this.initializeDeck();
+        }
+        return this.state.deck.pop();
+    }
+
+    calculateHandValue(hand) {
+        let value = 0;
+        let aceCount = 0;
+
+        for (const card of hand) {
+            if (card.rank === 'A') {
+                value += 11;
+                aceCount++;
+            } else if (['K', 'Q', 'J'].includes(card.rank)) {
+                value += 10;
+            } else {
+                value += parseInt(card.rank);
+            }
+        }
+
+        while (value > 21 && aceCount > 0) {
+            value -= 10;
+            aceCount--;
+        }
+
+        return value;
+    }
+
+    cacheDOM() {
+        this.dom = {
+            balance: document.getElementById('balance'),
+            currentBet: document.getElementById('current-bet'),
+            dealerCards: document.getElementById('dealer-cards'),
+            playerCards: document.getElementById('player-cards'),
+            playerArea: document.getElementById('player-area'),
+            dealerValue: document.getElementById('dealer-value'),
+            playerValue: document.getElementById('player-value'),
+            dealBtn: document.getElementById('deal-btn'),
+            bettingSection: document.getElementById('betting-section'),
+            actionButtons: document.getElementById('action-buttons'),
+            hitBtn: document.getElementById('hit-btn'),
+            standBtn: document.getElementById('stand-btn'),
+            doubleBtn: document.getElementById('double-btn'),
+            splitBtn: document.getElementById('split-btn'),
+            insuranceModal: document.getElementById('insurance-modal'),
+            insuranceYes: document.getElementById('insurance-yes'),
+            insuranceNo: document.getElementById('insurance-no'),
+            resultModal: document.getElementById('result-modal'),
+            resultIcon: document.getElementById('result-icon'),
+            resultTitle: document.getElementById('result-title'),
+            resultText: document.getElementById('result-text'),
+            resultBtn: document.getElementById('result-btn'),
+            historyBtn: document.getElementById('history-btn'),
+            historyPanel: document.getElementById('history-panel'),
+            historyBody: document.getElementById('history-body'),
+            closeHistory: document.getElementById('close-history'),
+            betInput: document.getElementById('bet-input'),
+            setBetBtn: document.getElementById('set-bet-btn'),
+            timerDisplay: document.getElementById('timer-display'),
+            timerText: document.getElementById('timer-text')
+        };
+    }
+
+    bindEvents() {
+        document.querySelectorAll('.chip-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const bet = parseInt(e.currentTarget.dataset.bet);
+                this.placeBet(bet);
+            });
+        });
+
+        document.querySelectorAll('.quick-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const action = e.currentTarget.dataset.action;
+                this.handleQuickAction(action);
+            });
+        });
+
+        this.dom.setBetBtn.addEventListener('click', () => this.setCustomBet());
+        this.dom.betInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.setCustomBet();
+        });
+        this.dom.dealBtn.addEventListener('click', () => this.startGame());
+        this.dom.hitBtn.addEventListener('click', () => this.hit());
+        this.dom.standBtn.addEventListener('click', () => this.stand());
+        this.dom.doubleBtn.addEventListener('click', () => this.doubleDown());
+        this.dom.splitBtn.addEventListener('click', () => this.split());
+        this.dom.insuranceYes.addEventListener('click', () => this.acceptInsurance());
+        this.dom.insuranceNo.addEventListener('click', () => this.declineInsurance());
+        this.dom.resultBtn.addEventListener('click', () => this.hideResultModal());
+        this.dom.historyBtn.addEventListener('click', () => this.showHistory());
+        this.dom.closeHistory.addEventListener('click', () => this.hideHistory());
+    }
+
+    setCustomBet() {
+        if (this.state.phase !== 'betting') return;
+        
+        const amount = parseInt(this.dom.betInput.value);
+        if (isNaN(amount) || amount < this.config.minBet) {
+            alert(`Minimum bet is ${this.config.minBet}`);
+            return;
+        }
+        
+        if (this.state.balance >= amount) {
+            this.playSound('betting');
+            this.state.balance += this.state.currentBet;
+            this.state.currentBet = 0;
+            
+            this.state.balance -= amount;
+            this.state.currentBet = amount;
+            this.dom.betInput.value = '';
+            this.updateUI();
+        } else {
+            alert('Insufficient balance!');
+        }
+    }
+
+    placeBet(amount) {
+        if (this.state.phase !== 'betting') return;
+        
+        if (this.state.currentBet + amount < this.config.minBet && this.state.currentBet === 0) {
+            alert(`Minimum bet is ${this.config.minBet}`);
+            return;
+        }
+        
+        if (this.state.balance >= amount) {
+            this.playSound('coin');
+            this.state.balance -= amount;
+            this.state.currentBet += amount;
+            this.updateUI();
+        }
+    }
+
+    handleQuickAction(action) {
+        if (this.state.phase !== 'betting') return;
+
+        switch (action) {
+            case 'clear':
+                if (this.state.currentBet > 0) {
+                    this.playSound('betting');
+                    this.state.balance += this.state.currentBet;
+                    this.state.currentBet = 0;
+                }
+                break;
+            case 'half':
+                if (this.state.currentBet > 0) {
+                    this.playSound('coin');
+                    const refund = Math.floor(this.state.currentBet / 2);
+                    this.state.balance += refund;
+                    this.state.currentBet -= refund;
+                }
+                break;
+            case 'all-in':
+                if (this.state.balance > 0) {
+                    this.playSound('betting');
+                    this.state.balance += this.state.currentBet;
+                    this.state.currentBet = this.state.balance;
+                    this.state.balance = 0;
+                }
+                break;
+        }
+        this.updateUI();
+    }
+
+    updateUI() {
+        this.dom.balance.textContent = this.state.balance.toLocaleString();
+        this.dom.currentBet.textContent = this.state.currentBet.toLocaleString();
+        this.dom.dealBtn.disabled = this.state.currentBet < this.config.minBet || this.state.phase !== 'betting';
+
+        if (this.state.phase === 'betting') {
+            this.dom.bettingSection.style.display = 'block';
+            this.dom.actionButtons.classList.remove('visible');
+        } else {
+            this.dom.bettingSection.style.display = 'none';
+            this.dom.actionButtons.classList.add('visible');
+        }
+
+        if (this.state.phase === 'playing') {
+            const currentHand = this.state.playerHands[this.state.currentHandIndex];
+            const playerValue = this.calculateHandValue(currentHand);
+            const canHit = playerValue < 21;
+            const canStand = playerValue < 21;
+            const canDouble = currentHand.length === 2 && 
+                             this.state.balance >= this.state.handBets[this.state.currentHandIndex] &&
+                             !this.state.isSplit;
+            
+            const canSplit = !this.state.isSplit &&
+                           currentHand.length === 2 &&
+                           this.getCardValue(currentHand[0]) === this.getCardValue(currentHand[1]) &&
+                           this.state.balance >= this.state.currentBet;
+
+            this.dom.hitBtn.disabled = !canHit;
+            this.dom.standBtn.disabled = !canStand;
+            this.dom.doubleBtn.disabled = !canDouble;
+            this.dom.splitBtn.disabled = !canSplit;
+            this.dom.splitBtn.style.display = canSplit ? 'flex' : 'none';
+        } else {
+            this.dom.splitBtn.style.display = 'none';
+        }
+    }
+
+    getCardValue(card) {
+        if (['K', 'Q', 'J'].includes(card.rank)) return 10;
+        if (card.rank === 'A') return 11;
+        return parseInt(card.rank);
+    }
+
+    async startGame() {
+        if (this.state.currentBet < this.config.minBet || this.state.phase !== 'betting') return;
+
+        if (this.state.timerInterval) {
+            clearInterval(this.state.timerInterval);
+        }
+
+        this.state.phase = 'dealing';
+        this.state.hasInsurance = false;
+        this.state.insuranceBet = 0;
+        this.state.dealerHand = [];
+        this.state.playerHands = [[]];
+        this.state.currentHandIndex = 0;
+        this.state.isSplit = false;
+        this.state.handBets = [this.state.currentBet];
+        this.cardElements.dealer = [];
+        this.cardElements.player = [[]];
+
+        this.dom.dealerCards.innerHTML = '';
+        this.dom.playerCards.innerHTML = '';
+        this.dom.dealerValue.classList.remove('visible');
+        this.dom.playerValue.classList.remove('visible');
+        this.dom.timerDisplay.classList.remove('visible');
+
+        this.updateUI();
+        await this.dealInitialCards();
+
+        const playerValue = this.calculateHandValue(this.state.playerHands[0]);
+        const dealerUpcard = this.state.dealerHand[0];
+        const dealerShowingAce = dealerUpcard.rank === 'A';
+        const dealerShowing10 = ['10', 'J', 'Q', 'K'].includes(dealerUpcard.rank);
+
+        if (dealerShowingAce) {
+            const insuranceCost = Math.floor(this.state.currentBet / 2);
+            if (this.state.balance >= insuranceCost) {
+                this.dom.insuranceModal.classList.add('show');
+                this.startPlayingTimer();
+                return;
+            }
+        }
+
+        if (dealerShowingAce || dealerShowing10) {
+            await this.delay(500);
+            await this.checkDealerBlackjack(playerValue);
+        } else {
+            if (playerValue === 21) {
+                await this.delay(800);
+                this.handlePlayerBlackjack();
+            } else {
+                this.state.phase = 'playing';
+                this.updateUI();
+                this.startPlayingTimer();
+            }
+        }
+    }
+
+    async dealInitialCards() {
+        await this.animateDealCard('player', 0, false, 600);
+        await this.delay(600);
+        
+        await this.animateDealCard('dealer', 0, false, 600);
+        await this.delay(600);
+        
+        await this.animateDealCard('player', 0, false, 600);
+        await this.delay(600);
+        
+        await this.animateDealCard('dealer', 0, true, 700);
+        
+        await this.delay(300);
+    }
+
+    async animateDealCard(target, handIndex, faceDown, animationDuration = 600) {
+        const card = this.drawCard();
+        
+        if (target === 'player') {
+            this.state.playerHands[handIndex].push(card);
+        } else {
+            this.state.dealerHand.push(card);
+        }
+
+        const cardEl = this.createCardElement(card, faceDown);
+        let container;
+        
+        if (target === 'player') {
+            if (this.state.isSplit) {
+                if (!this.cardElements.player[handIndex]) {
+                    this.cardElements.player[handIndex] = [];
+                }
+                const handContainers = this.dom.playerCards.querySelectorAll('.split-hand');
+                container = handContainers[handIndex].querySelector('.cards-container');
+            } else {
+                container = this.dom.playerCards;
+            }
+        } else {
+            container = this.dom.dealerCards;
+        }
+        
+        cardEl.style.animationDuration = `${animationDuration}ms`;
+        cardEl.classList.add('dealing');
+        
+        container.appendChild(cardEl);
+        
+        this.playSound('card');
+        
+        if (target === 'player') {
+            if (!this.cardElements.player[handIndex]) {
+                this.cardElements.player[handIndex] = [];
+            }
+            this.cardElements.player[handIndex].push(cardEl);
+        } else {
+            this.cardElements.dealer.push(cardEl);
+        }
+
+        await this.delay(animationDuration + 200);
+
+        if (target === 'player' && !this.state.isSplit) {
+            const value = this.calculateHandValue(this.state.playerHands[handIndex]);
+            this.dom.playerValue.textContent = value;
+            this.dom.playerValue.classList.add('visible');
+        }
+
+        if (target === 'dealer' && !faceDown) {
+            const visibleCards = this.state.dealerHand.filter((card, idx) => idx === 0);
+            const value = this.calculateHandValue(visibleCards);
+            this.dom.dealerValue.textContent = value;
+            this.dom.dealerValue.classList.add('visible');
+        }
+    }
+
+    createCardElement(card, isFaceDown) {
+        const cardEl = document.createElement('div');
+        cardEl.className = 'card';
+
+        if (isFaceDown) {
+            cardEl.classList.add('back');
+            cardEl.dataset.card = JSON.stringify(card);
+        } else {
+            const isRed = card.suit === 'hearts' || card.suit === 'diamonds';
+            cardEl.classList.add(isRed ? 'red' : 'black');
+
+            cardEl.innerHTML = `
+                <div class="card-inner">
+                    <div class="card-corner">
+                        <span class="card-rank">${card.rank}</span>
+                        <span class="card-suit-small">${this.getSuitSymbol(card.suit)}</span>
+                    </div>
+                    <span class="card-center">${this.getSuitSymbol(card.suit)}</span>
+                    <div class="card-corner bottom">
+                        <span class="card-rank">${card.rank}</span>
+                        <span class="card-suit-small">${this.getSuitSymbol(card.suit)}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        return cardEl;
+    }
+
+    getSuitSymbol(suit) {
+        const symbols = {
+            hearts: '♥',
+            diamonds: '♦',
+            clubs: '♣',
+            spades: '♠'
+        };
+        return symbols[suit];
+    }
+
+    async checkDealerBlackjack(playerValue) {
+        const holeCard = this.state.dealerHand[1];
+        const dealerValue = this.calculateHandValue(this.state.dealerHand);
+        
+        if (dealerValue === 21) {
+            await this.delay(500);
+            this.revealDealerCard();
+            await this.delay(this.config.cardFlipDelay);
+            
+            this.applyBlackjackAnimation(this.cardElements.dealer);
+            
+            if (playerValue === 21) {
+                this.applyBlackjackAnimation(this.cardElements.player[0]);
+                this.state.balance += this.state.currentBet;
+                this.addToHistory('Push - Both Blackjack', 0, 'push');
+                await this.delay(1000);
+                this.showResult('PUSH!', 'Both have Blackjack!', 'push', '🤝');
+            } else {
+                if (this.state.hasInsurance) {
+                    const insurancePayout = this.state.insuranceBet * 3;
+                    this.state.balance += insurancePayout;
+                    this.addToHistory('Insurance Paid', this.state.insuranceBet * 2, 'win');
+                    await this.delay(1000);
+                    this.showResult('DEALER BLACKJACK', 'Insurance pays 2:1', 'loss', '🛡️');
+                } else {
+                    this.addToHistory('Dealer Blackjack', this.state.currentBet, 'loss');
+                    await this.delay(1000);
+                    this.showResult('DEALER BLACKJACK', 'Dealer has Blackjack', 'loss', '😔');
+                }
+            }
+        } else {
+            if (playerValue === 21) {
+                await this.delay(800);
+                this.handlePlayerBlackjack();
+            } else {
+                this.state.phase = 'playing';
+                this.updateUI();
+                this.startPlayingTimer();
+            }
+        }
+    }
+
+    async handlePlayerBlackjack() {
+        this.revealDealerCard();
+        await this.delay(this.config.cardFlipDelay);
+        
+        this.applyBlackjackAnimation(this.cardElements.player[0]);
+        
+        const dealerValue = this.calculateHandValue(this.state.dealerHand);
+        
+        if (dealerValue === 21) {
+            this.applyBlackjackAnimation(this.cardElements.dealer);
+            this.state.balance += this.state.currentBet;
+            this.addToHistory('Push - Both Blackjack', 0, 'push');
+            await this.delay(1000);
+            this.showResult('PUSH!', 'Both have Blackjack!', 'push', '🤝');
+        } else {
+            const payout = Math.floor(this.state.currentBet * 2.5);
+            this.state.balance += payout;
+            this.addToHistory('BLACKJACK!', Math.floor(this.state.currentBet * 1.5), 'win');
+            await this.delay(1000);
+            this.showResult('BLACKJACK!', `You win ${Math.floor(this.state.currentBet * 1.5)} chips!`, 'win', '🎉');
+        }
+    }
+
+    applyBlackjackAnimation(cardElements) {
+        if (Array.isArray(cardElements)) {
+            cardElements.forEach((card, index) => {
+                setTimeout(() => {
+                    card.classList.add('blackjack-animation');
+                }, index * 100);
+            });
+        }
+    }
+
+    async acceptInsurance() {
+        this.state.insuranceBet = Math.floor(this.state.currentBet / 2);
+        this.state.balance -= this.state.insuranceBet;
+        this.state.hasInsurance = true;
+        this.dom.insuranceModal.classList.remove('show');
+
+        const playerValue = this.calculateHandValue(this.state.playerHands[0]);
+        await this.delay(500);
+        await this.checkDealerBlackjack(playerValue);
+    }
+
+    async declineInsurance() {
+        this.dom.insuranceModal.classList.remove('show');
+        const playerValue = this.calculateHandValue(this.state.playerHands[0]);
+        await this.delay(500);
+        await this.checkDealerBlackjack(playerValue);
+    }
+
+    revealDealerCard() {
+        if (this.cardElements.dealer.length > 1) {
+            const holeCard = this.cardElements.dealer[1];
+            const cardData = JSON.parse(holeCard.dataset.card || '{}');
+            
+            this.playSound('flip');
+            
+            holeCard.classList.remove('back');
+            holeCard.classList.add('flipping');
+            
+            const isRed = cardData.suit === 'hearts' || cardData.suit === 'diamonds';
+            holeCard.classList.add(isRed ? 'red' : 'black');
+            
+            holeCard.innerHTML = `
+                <div class="card-inner">
+                    <div class="card-corner">
+                        <span class="card-rank">${cardData.rank}</span>
+                        <span class="card-suit-small">${this.getSuitSymbol(cardData.suit)}</span>
+                    </div>
+                    <span class="card-center">${this.getSuitSymbol(cardData.suit)}</span>
+                    <div class="card-corner bottom">
+                        <span class="card-rank">${cardData.rank}</span>
+                        <span class="card-suit-small">${this.getSuitSymbol(cardData.suit)}</span>
+                    </div>
+                </div>
+            `;
+            
+            const dealerValue = this.calculateHandValue(this.state.dealerHand);
+            this.dom.dealerValue.textContent = dealerValue;
+            this.dom.dealerValue.classList.add('visible');
+        }
+    }
+
+    async split() {
+        if (this.state.phase !== 'playing' || this.state.isSplit) return;
+        
+        const currentHand = this.state.playerHands[0];
+        if (currentHand.length !== 2) return;
+        if (this.getCardValue(currentHand[0]) !== this.getCardValue(currentHand[1])) return;
+        if (this.state.balance < this.state.currentBet) return;
+
+        this.playSound('split');
+        this.state.balance -= this.state.currentBet;
+        this.state.isSplit = true;
+        this.state.handBets = [this.state.currentBet, this.state.currentBet];
+        
+        const card1 = currentHand[0];
+        const card2 = currentHand[1];
+        
+        this.state.playerHands = [[card1], [card2]];
+        this.state.currentHandIndex = 0;
+        
+        this.renderSplitHands();
+        
+        await this.delay(500);
+        await this.animateDealCard('player', 0, false, 600);
+        await this.delay(800);
+        await this.animateDealCard('player', 1, false, 600);
+        
+        this.updateSplitHandValues();
+        
+        const hand0Value = this.calculateHandValue(this.state.playerHands[0]);
+        if (hand0Value === 21) {
+            await this.delay(1000);
+            await this.moveToNextHand();
+        } else {
+            this.updateUI();
+        }
+    }
+
+    renderSplitHands() {
+        this.dom.playerCards.innerHTML = '';
+        this.dom.playerCards.classList.add('split-hands');
+        
+        for (let i = 0; i < 2; i++) {
+            const handDiv = document.createElement('div');
+            handDiv.className = 'split-hand';
+            if (i === this.state.currentHandIndex) {
+                handDiv.classList.add('active');
+            }
+            
+            const title = document.createElement('div');
+            title.className = 'split-hand-title';
+            title.textContent = `Hand ${i + 1}`;
+            
+            const valueDiv = document.createElement('div');
+            valueDiv.className = 'hand-value player-value visible';
+            valueDiv.id = `split-value-${i}`;
+            valueDiv.textContent = '0';
+            
+            const cardsDiv = document.createElement('div');
+            cardsDiv.className = 'cards-container';
+            
+            handDiv.appendChild(title);
+            handDiv.appendChild(valueDiv);
+            handDiv.appendChild(cardsDiv);
+            this.dom.playerCards.appendChild(handDiv);
+            
+            const hand = this.state.playerHands[i];
+            this.cardElements.player[i] = [];
+            for (const card of hand) {
+                const cardEl = this.createCardElement(card, false);
+                cardsDiv.appendChild(cardEl);
+                this.cardElements.player[i].push(cardEl);
+            }
+        }
+        
+        this.updateSplitHandValues();
+    }
+
+    updateSplitHandValues() {
+        if (!this.state.isSplit) return;
+        
+        for (let i = 0; i < this.state.playerHands.length; i++) {
+            const value = this.calculateHandValue(this.state.playerHands[i]);
+            const valueEl = document.getElementById(`split-value-${i}`);
+            if (valueEl) {
+                valueEl.textContent = value;
+            }
+        }
+        
+        const hands = this.dom.playerCards.querySelectorAll('.split-hand');
+        hands.forEach((hand, idx) => {
+            hand.classList.toggle('active', idx === this.state.currentHandIndex);
+        });
+    }
+
+    async hit() {
+        if (this.state.phase !== 'playing') return;
+
+        this.playSound('hit');
+        
+        const handIndex = this.state.currentHandIndex;
+        const card = this.drawCard();
+        this.state.playerHands[handIndex].push(card);
+
+        const cardEl = this.createCardElement(card, false);
+        cardEl.style.animationDuration = '600ms';
+        cardEl.classList.add('dealing');
+        
+        let container;
+        if (this.state.isSplit) {
+            const handContainers = this.dom.playerCards.querySelectorAll('.split-hand');
+            container = handContainers[handIndex].querySelector('.cards-container');
+        } else {
+            container = this.dom.playerCards;
+        }
+        
+        container.appendChild(cardEl);
+        this.cardElements.player[handIndex].push(cardEl);
+
+        await this.delay(this.config.cardDealDelay);
+
+        const playerValue = this.calculateHandValue(this.state.playerHands[handIndex]);
+        
+        if (this.state.isSplit) {
+            this.updateSplitHandValues();
+        } else {
+            this.dom.playerValue.textContent = playerValue;
+        }
+
+        if (playerValue > 21) {
+            this.playSound('bust');
+            await this.showBustAnimation();
+            await this.delay(500);
+            if (this.state.isSplit && handIndex === 0) {
+                await this.moveToNextHand();
+            } else {
+                if (this.state.isSplit) {
+                    await this.resolveSplitHands();
+                } else {
+                    this.addToHistory('Bust', this.state.currentBet, 'loss');
+                    this.showResult('BUST!', 'You went over 21', 'loss', '💔');
+                }
+            }
+        } else if (playerValue === 21) {
+            await this.delay(500);
+            await this.stand();
+        }
+
+        this.updateUI();
+    }
+
+    async showBustAnimation() {
+        const bustText = document.createElement('div');
+        bustText.className = 'bust-text';
+        bustText.textContent = 'BUST!';
+        document.body.appendChild(bustText);
+
+        await this.delay(600);
+        bustText.remove();
+    }
+
+    async doubleDown() {
+        if (this.state.phase !== 'playing') return;
+        const handIndex = this.state.currentHandIndex;
+        const currentHand = this.state.playerHands[handIndex];
+        if (currentHand.length !== 2) return;
+        if (this.state.balance < this.state.handBets[handIndex]) return;
+
+        this.playSound('double');
+        this.state.balance -= this.state.handBets[handIndex];
+        this.state.handBets[handIndex] *= 2;
+        this.updateUI();
+
+        const card = this.drawCard();
+        this.state.playerHands[handIndex].push(card);
+
+        const cardEl = this.createCardElement(card, false);
+        cardEl.style.animationDuration = '600ms';
+        cardEl.classList.add('dealing');
+        
+        let container;
+        if (this.state.isSplit) {
+            const handContainers = this.dom.playerCards.querySelectorAll('.split-hand');
+            container = handContainers[handIndex].querySelector('.cards-container');
+        } else {
+            container = this.dom.playerCards;
+        }
+        
+        container.appendChild(cardEl);
+        this.cardElements.player[handIndex].push(cardEl);
+
+        await this.delay(this.config.cardDealDelay);
+
+        const playerValue = this.calculateHandValue(this.state.playerHands[handIndex]);
+        
+        if (this.state.isSplit) {
+            this.updateSplitHandValues();
+        } else {
+            this.dom.playerValue.textContent = playerValue;
+        }
+
+        if (playerValue > 21) {
+            this.playSound('bust');
+            await this.showBustAnimation();
+            await this.delay(500);
+            if (this.state.isSplit && handIndex === 0) {
+                await this.moveToNextHand();
+            } else {
+                if (this.state.isSplit) {
+                    await this.resolveSplitHands();
+                } else {
+                    this.addToHistory('Bust (Double)', this.state.handBets[handIndex] / 2, 'loss');
+                    this.showResult('BUST!', 'Double down failed', 'loss', '💔');
+                }
+            }
+        } else {
+            await this.delay(500);
+            await this.stand();
+        }
+    }
+
+    async stand() {
+        if (this.state.phase !== 'playing') return;
+
+        this.playSound('stand');
+
+        if (this.state.timerInterval) {
+            clearInterval(this.state.timerInterval);
+            this.dom.timerDisplay.classList.remove('visible');
+        }
+
+        if (this.state.isSplit && this.state.currentHandIndex === 0) {
+            await this.moveToNextHand();
+        } else {
+            this.state.phase = 'resolving';
+            this.updateUI();
+
+            await this.delay(800);
+            this.revealDealerCard();
+            await this.delay(this.config.cardFlipDelay);
+            
+            await this.dealerPlay();
+        }
+    }
+
+    async moveToNextHand() {
+        this.state.currentHandIndex = 1;
+        this.updateSplitHandValues();
+        
+        const hand1Value = this.calculateHandValue(this.state.playerHands[1]);
+        if (hand1Value === 21) {
+            await this.delay(1000);
+            this.state.phase = 'resolving';
+            this.updateUI();
+            await this.delay(800);
+            this.revealDealerCard();
+            await this.delay(this.config.cardFlipDelay);
+            await this.dealerPlay();
+        } else {
+            this.updateUI();
+            this.startPlayingTimer();
+        }
+    }
+
+    async dealerPlay() {
+        let dealerValue = this.calculateHandValue(this.state.dealerHand);
+
+        while (dealerValue < this.config.dealerStandValue) {
+            await this.delay(this.config.dealerTurnDelay);
+            
+            const card = this.drawCard();
+            this.state.dealerHand.push(card);
+
+            const cardEl = this.createCardElement(card, false);
+            cardEl.style.animationDuration = '700ms';
+            cardEl.classList.add('dealing');
+            this.dom.dealerCards.appendChild(cardEl);
+            this.cardElements.dealer.push(cardEl);
+
+            this.playSound('card');
+
+            await this.delay(700);
+
+            dealerValue = this.calculateHandValue(this.state.dealerHand);
+            this.dom.dealerValue.textContent = dealerValue;
+        }
+
+        await this.delay(1000);
+        
+        if (this.state.isSplit) {
+            await this.resolveSplitHands();
+        } else {
+            this.determineWinner();
+        }
+    }
+
+    async resolveSplitHands() {
+        const dealerValue = this.calculateHandValue(this.state.dealerHand);
+        let totalWin = 0;
+        let totalLoss = 0;
+        let wins = 0;
+        let losses = 0;
+        let pushes = 0;
+
+        for (let i = 0; i < this.state.playerHands.length; i++) {
+            const playerValue = this.calculateHandValue(this.state.playerHands[i]);
+            const bet = this.state.handBets[i];
+
+            if (playerValue > 21) {
+                totalLoss += bet;
+                losses++;
+            } else if (dealerValue > 21) {
+                const payout = bet * 2;
+                this.state.balance += payout;
+                totalWin += bet;
+                wins++;
+            } else if (dealerValue > playerValue) {
+                totalLoss += bet;
+                losses++;
+            } else if (playerValue > dealerValue) {
+                const payout = bet * 2;
+                this.state.balance += payout;
+                totalWin += bet;
+                wins++;
+            } else {
+                this.state.balance += bet;
+                pushes++;
+            }
+        }
+
+        let resultText = '';
+        let resultType = 'push';
+        let icon = '🤝';
+        
+        if (totalWin > totalLoss) {
+            resultText = `Split: ${wins} Win, ${losses} Loss, ${pushes} Push. Net: +${totalWin - totalLoss}`;
+            resultType = 'win';
+            icon = '🎉';
+            this.addToHistory('Split Win', totalWin - totalLoss, 'win');
+            this.playSound('win');
+        } else if (totalLoss > totalWin) {
+            resultText = `Split: ${wins} Win, ${losses} Loss, ${pushes} Push. Net: -${totalLoss - totalWin}`;
+            resultType = 'loss';
+            icon = '😔';
+            this.addToHistory('Split Loss', totalLoss - totalWin, 'loss');
+        } else {
+            resultText = `Split: ${wins} Win, ${losses} Loss, ${pushes} Push. Break Even`;
+            this.addToHistory('Split Push', 0, 'push');
+        }
+
+        this.showResult('SPLIT RESULT', resultText, resultType, icon);
+    }
+
+    determineWinner() {
+        const playerValue = this.calculateHandValue(this.state.playerHands[0]);
+        const dealerValue = this.calculateHandValue(this.state.dealerHand);
+
+        if (dealerValue > 21) {
+            this.playSound('win');
+            const payout = this.state.currentBet * 2;
+            this.state.balance += payout;
+            this.addToHistory('Dealer Busts', this.state.currentBet, 'win');
+            this.showResult('YOU WIN!', `Dealer busts! You win ${this.state.currentBet} chips!`, 'win', '🎊');
+        } else if (dealerValue > playerValue) {
+            this.addToHistory('Dealer Wins', this.state.currentBet, 'loss');
+            this.showResult('DEALER WINS', 'Dealer has higher hand', 'loss', '😔');
+        } else if (playerValue > dealerValue) {
+            this.playSound('win');
+            const payout = this.state.currentBet * 2;
+            this.state.balance += payout;
+            this.addToHistory('Player Wins', this.state.currentBet, 'win');
+            this.showResult('YOU WIN!', `You win ${this.state.currentBet} chips!`, 'win', '🎉');
+        } else {
+            this.state.balance += this.state.currentBet;
+            this.addToHistory('Push', 0, 'push');
+            this.showResult('PUSH', 'Hands are equal! Your bet is returned.', 'push', '🤝');
+        }
+    }
+
+    showResult(title, text, type, icon) {
+        this.showFloatingText(icon);
+
+        if (this.state.timerInterval) {
+            clearInterval(this.state.timerInterval);
+            this.dom.timerDisplay.classList.remove('visible');
+        }
+
+        if (type === 'win') {
+            if (title === 'BLACKJACK!') {
+                this.playSound('blackjack');
+            } else {
+                this.playSound('win');
+            }
+        }
+
+        let iconClass = '';
+        let titleColor = '';
+
+        switch (type) {
+            case 'win':
+                iconClass = 'color: #51cf66;';
+                titleColor = '#51cf66';
+                break;
+            case 'loss':
+                iconClass = 'color: #ff6b6b;';
+                titleColor = '#ff6b6b';
+                break;
+            case 'push':
+                iconClass = 'color: #ffd700;';
+                titleColor = '#ffd700;';
+                break;
+        }
+
+        this.dom.resultIcon.innerHTML = `<i class="fas fa-star" style="${iconClass} font-size: 3rem;"></i>`;
+        this.dom.resultTitle.textContent = title;
+        this.dom.resultTitle.style.color = titleColor;
+        this.dom.resultText.textContent = text;
+        this.dom.resultModal.classList.add('show');
+    }
+
+    showFloatingText(text) {
+        const floating = document.createElement('div');
+        floating.className = 'floating-text';
+        floating.textContent = text;
+        document.body.appendChild(floating);
+
+        setTimeout(() => floating.remove(), 1500);
+    }
+
+    hideResultModal() {
+        this.dom.resultModal.classList.remove('show');
+        this.resetGame();
+    }
+
+    resetGame() {
+        this.state.currentBet = 0;
+        this.state.phase = 'betting';
+        this.state.dealerHand = [];
+        this.state.playerHands = [[]];
+        this.state.currentHandIndex = 0;
+        this.state.isSplit = false;
+        this.state.handBets = [];
+        this.cardElements.dealer = [];
+        this.cardElements.player = [[]];
+
+        this.dom.dealerCards.innerHTML = '';
+        this.dom.playerCards.innerHTML = '';
+        this.dom.playerCards.classList.remove('split-hands');
+        this.dom.dealerValue.classList.remove('visible');
+        this.dom.playerValue.classList.remove('visible');
+
+        this.updateUI();
+    }
+
+    addToHistory(result, amount, type) {
+        const now = new Date();
+        this.state.gameHistory.unshift({
+            result,
+            amount,
+            type,
+            time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            date: now.toLocaleDateString()
+        });
+
+        if (this.state.gameHistory.length > 50) {
+            this.state.gameHistory.pop();
+        }
+    }
+
+    showHistory() {
+        const history = this.state.gameHistory;
+        let html = '';
+
+        if (history.length === 0) {
+            html = `
+                <div class="empty-state">
+                    <i class="fas fa-history"></i>
+                    <p>No game history yet</p>
+                    <p style="font-size: 0.85rem; margin-top: 8px;">Play some games to see your history!</p>
+                </div>
+            `;
+        } else {
+            const wins = history.filter(h => h.type === 'win').length;
+            const losses = history.filter(h => h.type === 'loss').length;
+            const pushes = history.filter(h => h.type === 'push').length;
+
+            html = `
+                <div class="history-stats">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" style="color: #51cf66;">${wins}</div>
+                            <div class="stat-label">Wins</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" style="color: #ff6b6b;">${losses}</div>
+                            <div class="stat-label">Losses</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" style="color: #ffd700;">${pushes}</div>
+                            <div class="stat-label">Pushes</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="history-list">
+            `;
+
+            for (const item of history) {
+                let amountClass = 'zero';
+                let amountText = '0';
+
+                if (item.type === 'win') {
+                    amountClass = 'positive';
+                    amountText = `+${item.amount.toLocaleString()}`;
+                } else if (item.type === 'loss') {
+                    amountClass = 'negative';
+                    amountText = `-${item.amount.toLocaleString()}`;
+                }
+
+                html += `
+                    <div class="history-item ${item.type}">
+                        <div>
+                            <div class="history-result-name">${item.result}</div>
+                            <div class="history-result-details">${item.date} ${item.time}</div>
+                        </div>
+                        <div class="history-result-amount ${amountClass}">${amountText}</div>
+                    </div>
+                `;
+            }
+
+            html += '</div>';
+        }
+
+        this.dom.historyBody.innerHTML = html;
+        this.dom.historyPanel.classList.add('show');
+    }
+
+    hideHistory() {
+        this.dom.historyPanel.classList.remove('show');
+    }
+
+    delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    window.game = new BlackjackGame();
+});
+</script>
+</body>
+</html>
