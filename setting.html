@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Play - Settings</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(180deg, #0a1628 0%, #162447 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: linear-gradient(180deg, #0d1b2a 0%, #1b263b 100%);
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 80px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(180deg, #0a1628 0%, #162447 100%);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(255, 165, 0, 0.3);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            background: rgba(255, 165, 0, 0.15);
+            border: 2px solid #ffa500;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #ffa500;
+            font-size: 20px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 165, 0, 0.25);
+            transform: scale(1.05);
+        }
+
+        .header-title {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .settings-icon {
+            color: #ffa500;
+            font-size: 24px;
+        }
+
+        /* Profile Section */
+        .profile-section {
+            background: rgba(255, 165, 0, 0.1);
+            border: 2px solid rgba(255, 165, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .profile-avatar {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffa500 0%, #ff8c00 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-weight: bold;
+            color: white;
+            border: 3px solid rgba(255, 165, 0, 0.5);
+        }
+
+        .edit-avatar-btn {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            background: linear-gradient(135deg, #ffa500 0%, #ff8c00 100%);
+            border: 3px solid #0d1b2a;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .edit-avatar-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .profile-id {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .edit-profile-btn {
+            background: rgba(255, 165, 0, 0.2);
+            border: 2px solid #ffa500;
+            color: #ffa500;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .edit-profile-btn:hover {
+            background: rgba(255, 165, 0, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Settings Sections */
+        .settings-content {
+            padding: 0 20px;
+        }
+
+        .settings-section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            color: #94a3b8;
+            font-size: 13px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            padding-left: 5px;
+        }
+
+        .settings-item {
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid rgba(148, 163, 184, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .settings-item:hover {
+            background: rgba(30, 41, 59, 0.7);
+            border-color: rgba(255, 165, 0, 0.5);
+            transform: translateX(5px);
+        }
+
+        .item-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .item-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            background: rgba(255, 165, 0, 0.15);
+            border: 2px solid rgba(255, 165, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .item-text-group {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .item-text {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .item-subtitle {
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        .item-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .item-value {
+            color: #ffa500;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .arrow-icon {
+            color: #94a3b8;
+            font-size: 18px;
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 56px;
+            height: 30px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(148, 163, 184, 0.3);
+            transition: .3s;
+            border-radius: 30px;
+            border: 2px solid rgba(148, 163, 184, 0.2);
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 2px;
+            bottom: 2px;
+            background: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background: linear-gradient(135deg, #ffa500 0%, #ff8c00 100%);
+            border-color: #ffa500;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Logout Button */
+        .logout-section {
+            padding: 0 20px 20px;
+        }
+
+        .logout-btn {
+            background: rgba(220, 38, 38, 0.15);
+            border: 2px solid #dc2626;
+            color: #ef4444;
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(220, 38, 38, 0.25);
+            transform: translateY(-2px);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 480px;
+            width: 100%;
+            background: linear-gradient(180deg, #0a1628 0%, #000000 100%);
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            border-top: 2px solid rgba(255, 165, 0, 0.3);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 5px 15px;
+            text-decoration: none;
+        }
+
+        .nav-item.active {
+            color: #ffa500;
+        }
+
+        .nav-item:hover {
+            color: #ffa500;
+            transform: translateY(-2px);
+        }
+
+        .nav-icon {
+            font-size: 24px;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(180deg, #0d1b2a 0%, #1b263b 100%);
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 380px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 165, 0, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+
+        .modal-title {
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .modal-text {
+            color: #94a3b8;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+
+        .cancel-btn {
+            background: rgba(148, 163, 184, 0.2);
+            border: 2px solid rgba(148, 163, 184, 0.3);
+            color: white;
+        }
+
+        .cancel-btn:hover {
+            background: rgba(148, 163, 184, 0.3);
+        }
+
+        .confirm-btn {
+            background: linear-gradient(135deg, #ffa500 0%, #ff8c00 100%);
+            color: white;
+        }
+
+        .confirm-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 165, 0, 0.5);
+        }
+
+        .confirm-btn.danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            color: #e2e8f0;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid rgba(148, 163, 184, 0.2);
+            border-radius: 10px;
+            color: white;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #ffa500;
+            background: rgba(30, 41, 59, 0.8);
+        }
+
+        /* Badge */
+        .badge {
+            background: linear-gradient(135deg, #ffa500 0%, #ff8c00 100%);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .badge.new {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <a href="user.html" class="back-btn">←</a>
+                <div class="header-title">Settings</div>
+            </div>
+            <div class="settings-icon">⚙️</div>
+        </div>
+
+        <!-- Profile Section -->
+        <div class="profile-section">
+            <div class="profile-avatar">
+                <span id="avatarLetter">M</span>
+                <div class="edit-avatar-btn" onclick="openEditAvatar()">📷</div>
+            </div>
+            <div class="profile-info">
+                <div class="profile-name" id="profileName">MemberIN55AGZ7V</div>
+                <div class="profile-id">UID: 45257016</div>
+                <button class="edit-profile-btn" onclick="openEditProfile()">Edit Profile</button>
+            </div>
+        </div>
+
+        <!-- Settings Content -->
+        <div class="settings-content">
+            <!-- Account Section -->
+            <div class="settings-section">
+                <div class="section-title">Account Settings</div>
+                
+                <div class="settings-item" onclick="openPasswordChange()">
+                    <div class="item-left">
+                        <div class="item-icon">🔒</div>
+                        <div class="item-text-group">
+                            <div class="item-text">Login Password</div>
+                            <div class="item-subtitle">Change your password</div>
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <span class="item-value">Set</span>
+                        <span class="arrow-icon">›</span>
+                    </div>
+                </div>
+
+                <div class="settings-item" onclick="openEmailBinding()">
+                    <div class="item-left">
+                        <div class="item-icon">📧</div>
+                        <div class="item-text-group">
+                            <div class="item-text">Email Address</div>
+                            <div class="item-subtitle">Manage email binding</div>
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <label class="toggle-switch" onclick="event.stopPropagation()">
+                            <input type="checkbox" id="emailToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="settings-item" onclick="openPhoneBinding()">
+                    <div class="item-left">
+                        <div class="item-icon">📱</div>
+                        <div class="item-text-group">
+                            <div class="item-text">Phone Number</div>
+                            <div class="item-subtitle">Link your phone</div>
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <span class="badge new">New</span>
+                        <span class="arrow-icon">›</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- App Settings -->
+            <div class="settings-section">
+                <div class="section-title">App Settings</div>
+                
+                <div class="settings-item">
+                    <div class="item-left">
+                        <div class="item-icon">🔔</div>
+                        <div class="item-text-group">
+                            <div class="item-text">Notifications</div>
+                            <div class="item-subtitle">Push notifications</div>
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <label class="toggle-switch" onclick="event.stopPropagation()">
+                            <input type="checkbox" id="notificationsToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="settings-item">
+                    <div class="item-left">
+                        <div class="item-icon">🔊</div>
+                        <div class="item-text-group">
+                            <div class="item-text">Sound Effects</div>
+                            <div class="item-subtitle">Game audio</div>
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <label class="toggle-switch" onclick="event.stopPropagation()">
+                            <input type="checkbox" id="soundToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="settings-item" onclick="openLanguage()">
+                    <div class="item-left">
+                        <div class="item-icon">🌐</div>
+                        <div class="item-text-group">
+                            <div class="item-text">Language</div>
+                            <div class="item-subtitle">Change app language</div>
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <span class="item-value">English</span>
+                        <span class="arrow-icon">›</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security & Privacy -->
+            <div class="settings-section">
+                <div class="section-title">Security & Privacy</div>
+                
+                <div class="settings-item" onclick="openPrivacy()">
+                    <div class="item-left">
+                        <div class="item-icon">🛡️</div>
+                        <div class="item-text-group">
+                            <div class="item-text">Privacy Settings</div>
+                            <div class="item-subtitle">Manage your privacy</div>
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <span class="arrow-icon">›</span>
+                    </div>
+                </div>
+
+                <div class="settings-item">
+                    <div class="item-left">
+                        <div class="item-icon">🔐</div>
+                        <div class="item-text-group">
+                            <div class="item-text">Two-Factor Auth</div>
+                            <div class="item-subtitle">Extra security layer</div>
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <span class="badge">Pro</span>
+                        <span class="arrow-icon">›</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support -->
+            <div class="settings-section">
+                <div class="section-title">Support & About</div>
+                
+                <a href="chatbot.html" class="settings-item" style="text-decoration: none; color: inherit;">
+                    <div class="item-left">
+                        <div class="item-icon">💬</div>
+                        <div class="item-text-group">
+                            <div class="item-text">Help & Support</div>
+                            <div class="item-subtitle">Contact us</div>
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <span class="arrow-icon">›</span>
+                    </div>
+                </a>
+
+                <div class="settings-item">
+                    <div class="item-left">
+                        <div class="item-icon">ℹ️</div>
+                        <div class="item-text-group">
+                            <div class="item-text">App Version</div>
+                            <div class="item-subtitle">Current version</div>
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <span class="item-value">1.0.0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logout Button -->
+        <div class="logout-section">
+            <button class="logout-btn" onclick="openLogoutModal()">
+                <span>🚪</span>
+                <span>Logout</span>
+            </button>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="games.html" class="nav-item">
+                <div class="nav-icon">🎮</div>
+                <div class="nav-label">Games</div>
+            </a>
+
+            <a href="promotion.html" class="nav-item">
+                <div class="nav-icon">📢</div>
+                <div class="nav-label">Promotion</div>
+            </a>
+
+            <a href="wallet.html" class="nav-item">
+                <div class="nav-icon">💰</div>
+                <div class="nav-label">Wallet</div>
+            </a>
+
+            <a href="user.html" class="nav-item active">
+                <div class="nav-icon">👤</div>
+                <div class="nav-label">User</div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div class="modal" id="editProfileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-icon">👤</div>
+                <div class="modal-title">Edit Profile</div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Username</label>
+                <input type="text" class="form-input" id="usernameInput" placeholder="Enter new username">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Display Name</label>
+                <input type="text" class="form-input" id="displayNameInput" placeholder="Enter display name">
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel-btn" onclick="closeEditProfile()">Cancel</button>
+                <button class="modal-btn confirm-btn" onclick="saveProfile()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div class="modal" id="passwordModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-icon">🔒</div>
+                <div class="modal-title">Change Password</div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Current Password</label>
+                <input type="password" class="form-input" id="currentPassword" placeholder="Enter current password">
+            </div>
+            <div class="form-group">
+                <label class="form-label">New Password</label>
+                <input type="password" class="form-input" id="newPassword" placeholder="Enter new password">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Confirm Password</label>
+                <input type="password" class="form-input" id="confirmPassword" placeholder="Confirm new password">
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel-btn" onclick="closePasswordChange()">Cancel</button>
+                <button class="modal-btn confirm-btn" onclick="savePassword()">Change</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div class="modal" id="logoutModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-icon">🚪</div>
+                <div class="modal-title">Logout</div>
+                <div class="modal-text">Are you sure you want to logout?</div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel-btn" onclick="closeLogoutModal()">Cancel</button>
+                <button class="modal-btn confirm-btn danger" onclick="confirmLogout()">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Profile Functions
+        function openEditProfile() {
+            document.getElementById('editProfileModal').classList.add('show');
+        }
+
+        function closeEditProfile() {
+            document.getElementById('editProfileModal').classList.remove('show');
+        }
+
+        function saveProfile() {
+            const username = document.getElementById('usernameInput').value;
+            const displayName = document.getElementById('displayNameInput').value;
+            
+            if (username || displayName) {
+                const newName = displayName || username;
+                document.getElementById('profileName').textContent = newName;
+                document.getElementById('avatarLetter').textContent = newName.charAt(0).toUpperCase();
+                alert('✅ Profile updated successfully!');
+            }
+            closeEditProfile();
+        }
+
+        function openEditAvatar() {
+            alert('📷 Avatar customization coming soon!');
+        }
+
+        // Password Functions
+        function openPasswordChange() {
+            document.getElementById('passwordModal').classList.add('show');
+        }
+
+        function closePasswordChange() {
+            document.getElementById('passwordModal').classList.remove('show');
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+        }
+
+        function savePassword() {
+            const current = document.getElementById('currentPassword').value;
+            const newPass = document.getElementById('newPassword').value;
+            const confirm = document.getElementById('confirmPassword').value;
+
+            if (!current || !newPass || !confirm) {
+                alert('⚠️ Please fill all fields');
+                return;
+            }
+
+            if (newPass !== confirm) {
+                alert('⚠️ Passwords do not match');
+                return;
+            }
+
+            if (newPass.length < 6) {
+                alert('⚠️ Password must be at least 6 characters');
+                return;
+            }
+
+            alert('✅ Password changed successfully!');
+            closePasswordChange();
+        }
+
+        // Other Settings Functions
+        function openEmailBinding() {
+            alert('📧 Email binding settings');
+        }
+
+        function openPhoneBinding() {
+            alert('📱 Phone binding coming soon!');
+        }
+
+        function openLanguage() {
+            alert('🌐 Language options: English, Hindi, Tamil, etc.');
+        }
+
+        function openPrivacy() {
+            alert('🛡️ Privacy settings panel');
+        }
+
+        // Logout Functions
+        function openLogoutModal() {
+            document.getElementById('logoutModal').classList.add('show');
+        }
+
+        function closeLogoutModal() {
+            document.getElementById('logoutModal').classList.remove('show');
+        }
+
+        function confirmLogout() {
+            // Clear user data
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            // Redirect to login
+            window.location.href = 'index.html';
+        }
+
+        // Toggle Functions
+        document.getElementById('emailToggle').addEventListener('change', function() {
+            if(this.checked) {
+                alert('✅ Email notifications enabled');
+            } else {
+                alert('🔕 Email notifications disabled');
+            }
+        });
+
+        document.getElementById('notificationsToggle').addEventListener('change', function() {
+            if(this.checked) {
+                alert('🔔 Push notifications enabled');
+            } else {
+                alert('🔕 Push notifications disabled');
+            }
+        });
+
+        document.getElementById('soundToggle').addEventListener('change', function() {
+            if(this.checked) {
+                alert('🔊 Sound effects enabled');
+            } else {
+                alert('🔇 Sound effects disabled');
+            }
+        });
+
+        // Close modals when clicking outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.classList.remove('show');
+                }
+            });
+        });
+
+        // Load saved profile data
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedName = localStorage.getItem('profileName');
+            if (savedName) {
+                document.getElementById('profileName').textContent = savedName;
+                document.getElementById('avatarLetter').textContent = savedName.charAt(0).toUpperCase();
+            }
+
+            // Load toggle states
+            const emailEnabled = localStorage.getItem('emailEnabled');
+            const notificationsEnabled = localStorage.getItem('notificationsEnabled');
+            const soundEnabled = localStorage.getItem('soundEnabled');
+
+            if (emailEnabled !== null) {
+                document.getElementById('emailToggle').checked = emailEnabled === 'true';
+            }
+            if (notificationsEnabled !== null) {
+                document.getElementById('notificationsToggle').checked = notificationsEnabled === 'true';
+            }
+            if (soundEnabled !== null) {
+                document.getElementById('soundToggle').checked = soundEnabled === 'true';
+            }
+        });
+
+        // Save toggle states
+        document.getElementById('emailToggle').addEventListener('change', function() {
+            localStorage.setItem('emailEnabled', this.checked);
+            if(this.checked) {
+                alert('✅ Email notifications enabled');
+            } else {
+                alert('🔕 Email notifications disabled');
+            }
+        });
+
+        document.getElementById('notificationsToggle').addEventListener('change', function() {
+            localStorage.setItem('notificationsEnabled', this.checked);
+            if(this.checked) {
+                alert('🔔 Push notifications enabled');
+            } else {
+                alert('🔕 Push notifications disabled');
+            }
+        });
+
+        document.getElementById('soundToggle').addEventListener('change', function() {
+            localStorage.setItem('soundEnabled', this.checked);
+            if(this.checked) {
+                alert('🔊 Sound effects enabled');
+            } else {
+                alert('🔇 Sound effects disabled');
+            }
+        });
+
+        // Save profile data
+        function saveProfile() {
+            const username = document.getElementById('usernameInput').value;
+            const displayName = document.getElementById('displayNameInput').value;
+            
+            if (username || displayName) {
+                const newName = displayName || username;
+                document.getElementById('profileName').textContent = newName;
+                document.getElementById('avatarLetter').textContent = newName.charAt(0).toUpperCase();
+                localStorage.setItem('profileName', newName);
+                alert('✅ Profile updated successfully!');
+            }
+            closeEditProfile();
+        }
+    </script>
+</body>
+</html>

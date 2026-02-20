@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Play - Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(180deg, #0a1628 0%, #162447 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: linear-gradient(180deg, #0d1b2a 0%, #1b263b 100%);
+            min-height: 100vh;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(180deg, #0a1628 0%, #162447 100%);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .back-button {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px 10px;
+            margin-right: 15px;
+        }
+
+        .header-title {
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        /* Login Form Container */
+        .login-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 30px 25px;
+        }
+
+        /* Logo Section */
+        .logo-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo-img {
+            height: 80px;
+            width: auto;
+            object-fit: contain;
+            margin-bottom: 20px;
+        }
+
+        .welcome-text {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .welcome-subtext {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        /* Login Method Tabs */
+        .method-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            background: rgba(30, 41, 59, 0.3);
+            padding: 5px;
+            border-radius: 10px;
+        }
+
+        .method-tab {
+            flex: 1;
+            padding: 12px;
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .method-tab.active {
+            background: linear-gradient(135deg, #ffa500 0%, #ff8c00 100%);
+            color: white;
+            box-shadow: 0 2px 10px rgba(255, 165, 0, 0.4);
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group.hidden {
+            display: none;
+        }
+
+        .form-label {
+            display: block;
+            color: #e2e8f0;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px 45px 15px 15px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid rgba(148, 163, 184, 0.2);
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #ffa500;
+            background: rgba(30, 41, 59, 0.8);
+        }
+
+        .form-input::placeholder {
+            color: #64748b;
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* Phone Input with Country Code */
+        .phone-input-wrapper {
+            display: flex;
+            gap: 10px;
+        }
+
+        .country-code {
+            width: 100px;
+            padding: 14px 10px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid rgba(148, 163, 184, 0.2);
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+        }
+
+        .country-code:focus {
+            outline: none;
+            border-color: #ffa500;
+            background: rgba(30, 41, 59, 0.8);
+        }
+
+        /* OTP Input */
+        .otp-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .otp-input {
+            width: 50px;
+            height: 55px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid rgba(148, 163, 184, 0.2);
+            border-radius: 10px;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .otp-input:focus {
+            outline: none;
+            border-color: #ffa500;
+            background: rgba(30, 41, 59, 0.8);
+        }
+
+        /* OTP Timer */
+        .otp-timer {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .resend-otp {
+            color: #ffa500;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .resend-otp.disabled {
+            color: #64748b;
+            cursor: not-allowed;
+        }
+
+        /* Send OTP Button */
+        .btn-send-otp {
+            width: 100%;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: none;
+            color: white;
+            padding: 14px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+            margin-top: 10px;
+        }
+
+        .btn-send-otp:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
+        }
+
+        /* Remember & Forgot Section */
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #e2e8f0;
+            font-size: 14px;
+        }
+
+        .remember-me input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #ffa500;
+        }
+
+        .forgot-password {
+            color: #ffa500;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+
+        /* Login Button */
+        .btn-login {
+            width: 100%;
+            background: linear-gradient(135deg, #ffa500 0%, #ff8c00 100%);
+            border: none;
+            color: white;
+            padding: 16px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 165, 0, 0.4);
+            margin-bottom: 20px;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 165, 0, 0.6);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        /* Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 25px 0;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(148, 163, 184, 0.3);
+        }
+
+        .divider span {
+            padding: 0 15px;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        /* Social Login Buttons */
+        .social-login {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .social-btn {
+            flex: 1;
+            padding: 12px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid rgba(148, 163, 184, 0.2);
+            border-radius: 10px;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .social-btn:hover {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: #ffa500;
+            transform: translateY(-2px);
+        }
+
+        /* Register Link */
+        .register-link {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .register-link a {
+            color: #ffa500;
+            text-decoration: none;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* Error Message */
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .success-message {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #86efac;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: linear-gradient(180deg, #0d1b2a 0%, #1b263b 100%);
+            padding: 30px 25px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 420px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-title {
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            font-size: 28px;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: white;
+        }
+
+        /* Recovery Method Selection */
+        .recovery-methods {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .recovery-method {
+            padding: 18px 20px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid rgba(148, 163, 184, 0.2);
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .recovery-method:hover {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: #ffa500;
+            transform: translateY(-2px);
+        }
+
+        .recovery-method.selected {
+            border-color: #ffa500;
+            background: rgba(255, 165, 0, 0.1);
+        }
+
+        .recovery-icon {
+            font-size: 28px;
+        }
+
+        .recovery-info {
+            flex: 1;
+        }
+
+        .recovery-label {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .recovery-detail {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        /* Progress Steps */
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 25px;
+            right: 25px;
+            height: 2px;
+            background: rgba(148, 163, 184, 0.3);
+            z-index: 0;
+        }
+
+        .progress-step {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            flex: 1;
+        }
+
+        .step-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(30, 41, 59, 0.8);
+            border: 2px solid rgba(148, 163, 184, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            font-size: 14px;
+            color: #64748b;
+            font-weight: bold;
+        }
+
+        .progress-step.active .step-circle {
+            background: linear-gradient(135deg, #ffa500 0%, #ff8c00 100%);
+            border-color: #ffa500;
+            color: white;
+        }
+
+        .progress-step.completed .step-circle {
+            background: #10b981;
+            border-color: #10b981;
+            color: white;
+        }
+
+        .step-label {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .progress-step.active .step-label {
+            color: #ffa500;
+            font-weight: 600;
+        }
+
+        .progress-step.completed .step-label {
+            color: #10b981;
+        }
+
+        /* Info Box */
+        .info-box {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .info-box-icon {
+            font-size: 20px;
+        }
+
+        .info-box-text {
+            color: #93c5fd;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        /* New Password Strength Indicator */
+        .password-strength {
+            margin-top: 8px;
+            height: 4px;
+            background: rgba(148, 163, 184, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .password-strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: all 0.3s;
+            border-radius: 2px;
+        }
+
+        .password-strength-text {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+
+        .strength-weak .password-strength-bar {
+            width: 33%;
+            background: #ef4444;
+        }
+
+        .strength-medium .password-strength-bar {
+            width: 66%;
+            background: #f59e0b;
+        }
+
+        .strength-strong .password-strength-bar {
+            width: 100%;
+            background: #10b981;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <button class="back-button" onclick="goBack()">←</button>
+            <div class="header-title">Login</div>
+        </div>
+
+        <!-- Login Form -->
+        <div class="login-container">
+            <div class="logo-section">
+                <img src="quickplay logo.jpeg" alt="Quick Play" class="logo-img" onerror="this.style.display='none';">
+                <div class="welcome-text">Welcome Back!</div>
+                <div class="welcome-subtext">Login to continue playing</div>
+            </div>
+
+            <!-- Login Method Tabs -->
+            <div class="method-tabs">
+                <button class="method-tab active" onclick="switchMethod('password')" id="passwordTab">
+                    Password
+                </button>
+                <button class="method-tab" onclick="switchMethod('otp')" id="otpTab">
+                    OTP
+                </button>
+            </div>
+
+            <!-- Error/Success Message -->
+            <div class="error-message" id="errorMessage"></div>
+            <div class="success-message" id="successMessage"></div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <!-- Mobile Number Field (Common for both methods) -->
+                <div class="form-group">
+                    <label class="form-label">Mobile Number</label>
+                    <div class="phone-input-wrapper">
+                        <select class="country-code" id="countryCode">
+                            <option value="+1">+1 🇺🇸</option>
+                            <option value="+44">+44 🇬🇧</option>
+                            <option value="+91" selected>+91 🇮🇳</option>
+                            <option value="+86">+86 🇨🇳</option>
+                            <option value="+81">+81 🇯🇵</option>
+                            <option value="+61">+61 🇦🇺</option>
+                        </select>
+                        <div class="input-wrapper" style="flex: 1;">
+                            <input 
+                                type="tel" 
+                                class="form-input" 
+                                placeholder="Enter 10 digit number"
+                                id="phone"
+                                maxlength="10"
+                                pattern="[0-9]{10}"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                required
+                            >
+                            <span class="input-icon">📱</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Send OTP Button (Only for OTP method) -->
+                <div class="form-group hidden" id="sendOtpSection">
+                    <button type="button" class="btn-send-otp" onclick="sendOTP()">
+                        📲 SEND OTP
+                    </button>
+                </div>
+
+                <!-- OTP Input (Only for OTP method) -->
+                <div class="form-group hidden" id="otpSection">
+                    <label class="form-label">Enter OTP</label>
+                    <div class="otp-container">
+                        <input type="text" class="otp-input" maxlength="1" id="otp1" oninput="moveToNext(this, 'otp2')">
+                        <input type="text" class="otp-input" maxlength="1" id="otp2" oninput="moveToNext(this, 'otp3')">
+                        <input type="text" class="otp-input" maxlength="1" id="otp3" oninput="moveToNext(this, 'otp4')">
+                        <input type="text" class="otp-input" maxlength="1" id="otp4" oninput="moveToNext(this, 'otp5')">
+                        <input type="text" class="otp-input" maxlength="1" id="otp5" oninput="moveToNext(this, 'otp6')">
+                        <input type="text" class="otp-input" maxlength="1" id="otp6">
+                    </div>
+                    <div class="otp-timer">
+                        <span id="timer">Resend OTP in <span id="countdown">60</span>s</span>
+                        <span class="resend-otp disabled" id="resendOtp" onclick="resendOTP()">Resend OTP</span>
+                    </div>
+                </div>
+
+                <!-- Password Field (For Password method) -->
+                <div class="form-group" id="passwordSection">
+                    <label class="form-label">Password</label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="password" 
+                            class="form-input" 
+                            placeholder="Enter your password"
+                            id="password"
+                        >
+                        <span class="input-icon" onclick="togglePassword()">👁️</span>
+                    </div>
+                </div>
+
+                <!-- Remember & Forgot (Only for Password method) -->
+                <div class="form-options" id="passwordOptions">
+                    <label class="remember-me">
+                        <input type="checkbox" id="rememberMe">
+                        <span>Remember me</span>
+                    </label>
+                    <a class="forgot-password" onclick="openForgotPasswordModal()">Forgot Password?</a>
+                </div>
+
+                <!-- Login Button -->
+                <button type="submit" class="btn-login">LOGIN</button>
+            </form>
+
+            <!-- Divider -->
+            <div class="divider">
+                <span>Or continue with</span>
+            </div>
+
+            <!-- Social Login -->
+            <div class="social-login">
+                <button class="social-btn" onclick="socialLogin('google')">🔍</button>
+                <button class="social-btn" onclick="socialLogin('facebook')">📘</button>
+                <button class="social-btn" onclick="socialLogin('apple')">🍎</button>
+            </div>
+
+            <!-- Register Link -->
+            <div class="register-link">
+                Don't have an account?
+                <a href="register.html" onclick="goToRegister(event)">Register Now</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div class="modal" id="forgotPasswordModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Reset Password</div>
+                <button class="modal-close" onclick="closeForgotPasswordModal()">×</button>
+            </div>
+
+            <!-- Progress Steps -->
+            <div class="progress-steps">
+                <div class="progress-step active" id="step1">
+                    <div class="step-circle">1</div>
+                    <div class="step-label">Verify</div>
+                </div>
+                <div class="progress-step" id="step2">
+                    <div class="step-circle">2</div>
+                    <div class="step-label">OTP</div>
+                </div>
+                <div class="progress-step" id="step3">
+                    <div class="step-circle">3</div>
+                    <div class="step-label">Reset</div>
+                </div>
+            </div>
+
+            <div class="error-message" id="modalErrorMessage"></div>
+            <div class="success-message" id="modalSuccessMessage"></div>
+
+            <!-- Step 1: Mobile Number & Recovery Method -->
+            <div id="recoveryStep1" class="recovery-step-content">
+                <div class="form-group">
+                    <label class="form-label">Mobile Number</label>
+                    <div class="phone-input-wrapper">
+                        <select class="country-code" id="recoveryCountryCode">
+                            <option value="+1">+1 🇺🇸</option>
+                            <option value="+44">+44 🇬🇧</option>
+                            <option value="+91" selected>+91 🇮🇳</option>
+                            <option value="+86">+86 🇨🇳</option>
+                            <option value="+81">+81 🇯🇵</option>
+                            <option value="+61">+61 🇦🇺</option>
+                        </select>
+                        <div class="input-wrapper" style="flex: 1;">
+                            <input 
+                                type="tel" 
+                                class="form-input" 
+                                placeholder="Enter 10 digit number"
+                                id="recoveryPhone"
+                                maxlength="10"
+                                pattern="[0-9]{10}"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                            >
+                            <span class="input-icon">📱</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-label" style="margin-bottom: 15px;">Choose Recovery Method</div>
+                <div class="recovery-methods">
+                    <div class="recovery-method selected" onclick="selectRecoveryMethod('phone')" id="phoneMethod">
+                        <div class="recovery-icon">📱</div>
+                        <div class="recovery-info">
+                            <div class="recovery-label">Phone Number</div>
+                            <div class="recovery-detail">Receive OTP via SMS</div>
+                        </div>
+                    </div>
+                    <div class="recovery-method" onclick="selectRecoveryMethod('email')" id="emailMethod">
+                        <div class="recovery-icon">📧</div>
+                        <div class="recovery-info">
+                            <div class="recovery-label">Email Address</div>
+                            <div class="recovery-detail">Receive OTP via Email</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email Recovery Input -->
+                <div class="form-group hidden" id="recoveryEmailSection">
+                    <label class="form-label">Email Address</label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="email" 
+                            class="form-input" 
+                            placeholder="Enter your email"
+                            id="recoveryEmail"
+                        >
+                        <span class="input-icon">📧</span>
+                    </div>
+                </div>
+
+                <button class="btn-login" onclick="sendRecoveryOTP()">SEND OTP</button>
+            </div>
+
+            <!-- Step 2: OTP Verification -->
+            <div id="recoveryStep2" class="recovery-step-content" style="display: none;">
+                <div class="info-box">
+                    <div class="info-box-icon">ℹ️</div>
+                    <div class="info-box-text">
+                        We've sent a 6-digit OTP to your <span id="recoveryTarget"></span>. Please enter it below.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Enter OTP</label>
+                    <div class="otp-container">
+                        <input type="text" class="otp-input" maxlength="1" id="recoveryOtp1" oninput="moveToNextRecovery(this, 'recoveryOtp2')">
+                        <input type="text" class="otp-input" maxlength="1" id="recoveryOtp2" oninput="moveToNextRecovery(this, 'recoveryOtp3')">
+                        <input type="text" class="otp-input" maxlength="1" id="recoveryOtp3" oninput="moveToNextRecovery(this, 'recoveryOtp4')">
+                        <input type="text" class="otp-input" maxlength="1" id="recoveryOtp4" oninput="moveToNextRecovery(this, 'recoveryOtp5')">
+                        <input type="text" class="otp-input" maxlength="1" id="recoveryOtp5" oninput="moveToNextRecovery(this, 'recoveryOtp6')">
+                        <input type="text" class="otp-input" maxlength="1" id="recoveryOtp6">
+                    </div>
+                    <div class="otp-timer">
+                        <span id="recoveryTimer">Resend OTP in <span id="recoveryCountdown">60</span>s</span>
+                        <span class="resend-otp disabled" id="resendRecoveryOtp" onclick="resendRecoveryOTP()">Resend OTP</span>
+                    </div>
+                </div>
+
+                <button class="btn-login" onclick="verifyRecoveryOTP()">VERIFY OTP</button>
+            </div>
+
+            <!-- Step 3: Reset Password -->
+            <div id="recoveryStep3" class="recovery-step-content" style="display: none;">
+                <div class="info-box">
+                    <div class="info-box-icon">🔒</div>
+                    <div class="info-box-text">
+                        Create a strong password with at least 8 characters, including uppercase, lowercase, numbers, and special characters.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">New Password</label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="password" 
+                            class="form-input" 
+                            placeholder="Enter new password"
+                            id="newPassword"
+                            oninput="checkPasswordStrength()"
+                        >
+                        <span class="input-icon" onclick="toggleNewPassword()">👁️</span>
+                    </div>
+                    <div class="password-strength" id="passwordStrength">
+                        <div class="password-strength-bar"></div>
+                    </div>
+                    <div class="password-strength-text" id="passwordStrengthText"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Confirm Password</label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="password" 
+                            class="form-input" 
+                            placeholder="Re-enter new password"
+                            id="confirmPassword"
+                        >
+                        <span class="input-icon" onclick="toggleConfirmPassword()">👁️</span>
+                    </div>
+                </div>
+
+                <button class="btn-login" onclick="resetPassword()">RESET PASSWORD</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMethod = 'password';
+        let otpSent = false;
+        let countdownInterval;
+        let recoveryMethod = 'phone';
+        let recoveryCountdownInterval;
+        let currentRecoveryStep = 1;
+
+        // Switch Login Method
+        function switchMethod(method) {
+            currentMethod = method;
+            
+            const passwordTab = document.getElementById('passwordTab');
+            const otpTab = document.getElementById('otpTab');
+            const passwordSection = document.getElementById('passwordSection');
+            const passwordOptions = document.getElementById('passwordOptions');
+            const sendOtpSection = document.getElementById('sendOtpSection');
+            const otpSection = document.getElementById('otpSection');
+            
+            if (method === 'password') {
+                passwordTab.classList.add('active');
+                otpTab.classList.remove('active');
+                passwordSection.classList.remove('hidden');
+                passwordOptions.classList.remove('hidden');
+                sendOtpSection.classList.add('hidden');
+                otpSection.classList.add('hidden');
+                document.getElementById('password').required = true;
+            } else {
+                otpTab.classList.add('active');
+                passwordTab.classList.remove('active');
+                passwordSection.classList.add('hidden');
+                passwordOptions.classList.add('hidden');
+                sendOtpSection.classList.remove('hidden');
+                document.getElementById('password').required = false;
+            }
+            
+            otpSent = false;
+        }
+
+        // Send OTP
+        function sendOTP() {
+            const phone = document.getElementById('phone').value;
+            const countryCode = document.getElementById('countryCode').value;
+            
+            if (phone.length !== 10) {
+                showError('Please enter a valid 10-digit phone number');
+                return;
+            }
+            
+            // Simulate OTP sending
+            showSuccess('OTP sent to ' + countryCode + phone);
+            otpSent = true;
+            
+            document.getElementById('sendOtpSection').classList.add('hidden');
+            document.getElementById('otpSection').classList.remove('hidden');
+            document.getElementById('otp1').focus();
+            
+            // Start countdown
+            startCountdown();
+        }
+
+        // Start Countdown Timer
+        function startCountdown() {
+            let seconds = 60;
+            const countdownElement = document.getElementById('countdown');
+            const resendOtpElement = document.getElementById('resendOtp');
+            const timerElement = document.getElementById('timer');
+            
+            resendOtpElement.classList.add('disabled');
+            timerElement.style.display = 'inline';
+            
+            countdownInterval = setInterval(() => {
+                seconds--;
+                countdownElement.textContent = seconds;
+                
+                if (seconds <= 0) {
+                    clearInterval(countdownInterval);
+                    timerElement.style.display = 'none';
+                    resendOtpElement.classList.remove('disabled');
+                }
+            }, 1000);
+        }
+
+        // Resend OTP
+        function resendOTP() {
+            if (document.getElementById('resendOtp').classList.contains('disabled')) {
+                return;
+            }
+            sendOTP();
+        }
+
+        // Move to Next OTP Input
+        function moveToNext(current, nextId) {
+            if (current.value.length === 1) {
+                if (nextId) {
+                    document.getElementById(nextId).focus();
+                }
+            }
+        }
+
+        // Toggle Password Visibility
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const icon = event.target;
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                icon.textContent = '👁️';
+            }
+        }
+
+        // Get OTP Value
+        function getOTPValue() {
+            let otp = '';
+            for (let i = 1; i <= 6; i++) {
+                otp += document.getElementById('otp' + i).value;
+            }
+            return otp;
+        }
+
+        // Show Error
+        function showError(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+            
+            setTimeout(() => {
+                errorMessage.classList.remove('show');
+            }, 4000);
+        }
+
+        // Show Success
+        function showSuccess(message) {
+            const successMessage = document.getElementById('successMessage');
+            successMessage.textContent = message;
+            successMessage.classList.add('show');
+            
+            setTimeout(() => {
+                successMessage.classList.remove('show');
+            }, 4000);
+        }
+
+        // Modal Error
+        function showModalError(message) {
+            const errorMessage = document.getElementById('modalErrorMessage');
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+            
+            setTimeout(() => {
+                errorMessage.classList.remove('show');
+            }, 4000);
+        }
+
+        // Modal Success
+        function showModalSuccess(message) {
+            const successMessage = document.getElementById('modalSuccessMessage');
+            successMessage.textContent = message;
+            successMessage.classList.add('show');
+            
+            setTimeout(() => {
+                successMessage.classList.remove('show');
+            }, 4000);
+        }
+
+        // Handle Login
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const phone = document.getElementById('phone').value;
+            const countryCode = document.getElementById('countryCode').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+
+            if (currentMethod === 'password') {
+                const password = document.getElementById('password').value;
+                
+                if (!phone || !password) {
+                    showError('Please enter mobile number and password');
+                    return;
+                }
+                
+                if (phone.length !== 10) {
+                    showError('Please enter a valid 10-digit phone number');
+                    return;
+                }
+                
+                // Store login info (in real app, use secure authentication)
+                if (rememberMe) {
+                    localStorage.setItem('quickplay_phone', countryCode + phone);
+                }
+                
+                // Success - redirect to index page
+                showSuccess('Login successful! Welcome back!');
+                setTimeout(() => {
+                    window.location.href = 'games.html';
+                }, 1500);
+                
+            } else {
+                // OTP Method
+                if (!otpSent) {
+                    showError('Please send OTP first');
+                    return;
+                }
+                
+                const otp = getOTPValue();
+                if (otp.length !== 6) {
+                    showError('Please enter complete 6-digit OTP');
+                    return;
+                }
+                
+                // Verify OTP (in real app, verify with backend)
+                localStorage.setItem('quickplay_phone', countryCode + phone);
+                
+                showSuccess('Login successful! Welcome back!');
+                setTimeout(() => {
+                    window.location.href = 'games.html';
+                }, 1500);
+            }
+        }
+
+        // Forgot Password Modal Functions
+        function openForgotPasswordModal() {
+            document.getElementById('forgotPasswordModal').classList.add('show');
+            currentRecoveryStep = 1;
+            updateRecoverySteps();
+        }
+
+        function closeForgotPasswordModal() {
+            document.getElementById('forgotPasswordModal').classList.remove('show');
+            
+            // Clear countdown interval if running
+            if (recoveryCountdownInterval) {
+                clearInterval(recoveryCountdownInterval);
+            }
+            
+            // Reset all form fields
+            document.getElementById('recoveryPhone').value = '';
+            document.getElementById('recoveryEmail').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            
+            // Clear OTP inputs
+            for (let i = 1; i <= 6; i++) {
+                document.getElementById('recoveryOtp' + i).value = '';
+            }
+            
+            // Reset password strength indicator
+            const strengthBar = document.getElementById('passwordStrength');
+            strengthBar.classList.remove('strength-weak', 'strength-medium', 'strength-strong');
+            document.getElementById('passwordStrengthText').textContent = '';
+            
+            // Reset to step 1
+            currentRecoveryStep = 1;
+            recoveryMethod = 'phone';
+            
+            // Reset method selection
+            document.getElementById('phoneMethod').classList.add('selected');
+            document.getElementById('emailMethod').classList.remove('selected');
+            document.getElementById('recoveryEmailSection').classList.add('hidden');
+            
+            updateRecoverySteps();
+        }
+
+        function selectRecoveryMethod(method) {
+            recoveryMethod = method;
+            
+            const phoneMethod = document.getElementById('phoneMethod');
+            const emailMethod = document.getElementById('emailMethod');
+            const emailSection = document.getElementById('recoveryEmailSection');
+            
+            if (method === 'phone') {
+                phoneMethod.classList.add('selected');
+                emailMethod.classList.remove('selected');
+                emailSection.classList.add('hidden');
+            } else {
+                emailMethod.classList.add('selected');
+                phoneMethod.classList.remove('selected');
+                emailSection.classList.remove('hidden');
+            }
+        }
+
+        function sendRecoveryOTP() {
+            if (recoveryMethod === 'phone') {
+                const phone = document.getElementById('recoveryPhone').value;
+                const countryCode = document.getElementById('recoveryCountryCode').value;
+                
+                if (phone.length !== 10) {
+                    showModalError('Please enter a valid 10-digit phone number');
+                    return;
+                }
+                
+                // Simulate sending OTP
+                showModalSuccess('OTP sent to ' + countryCode + phone);
+                document.getElementById('recoveryTarget').textContent = 'phone number ' + countryCode + phone;
+            } else {
+                const email = document.getElementById('recoveryEmail').value;
+                
+                if (!email || !email.includes('@')) {
+                    showModalError('Please enter a valid email address');
+                    return;
+                }
+                
+                // Simulate sending OTP
+                showModalSuccess('OTP sent to ' + email);
+                document.getElementById('recoveryTarget').textContent = 'email ' + email;
+            }
+            
+            // Move to step 2
+            currentRecoveryStep = 2;
+            updateRecoverySteps();
+            document.getElementById('recoveryOtp1').focus();
+            startRecoveryCountdown();
+        }
+
+        function startRecoveryCountdown() {
+            let seconds = 60;
+            const countdownElement = document.getElementById('recoveryCountdown');
+            const resendOtpElement = document.getElementById('resendRecoveryOtp');
+            const timerElement = document.getElementById('recoveryTimer');
+            
+            resendOtpElement.classList.add('disabled');
+            timerElement.style.display = 'inline';
+            
+            recoveryCountdownInterval = setInterval(() => {
+                seconds--;
+                countdownElement.textContent = seconds;
+                
+                if (seconds <= 0) {
+                    clearInterval(recoveryCountdownInterval);
+                    timerElement.style.display = 'none';
+                    resendOtpElement.classList.remove('disabled');
+                }
+            }, 1000);
+        }
+
+        function resendRecoveryOTP() {
+            if (document.getElementById('resendRecoveryOtp').classList.contains('disabled')) {
+                return;
+            }
+            
+            // Clear OTP inputs
+            for (let i = 1; i <= 6; i++) {
+                document.getElementById('recoveryOtp' + i).value = '';
+            }
+            
+            if (recoveryMethod === 'phone') {
+                const phone = document.getElementById('recoveryPhone').value;
+                const countryCode = document.getElementById('recoveryCountryCode').value;
+                showModalSuccess('OTP resent to ' + countryCode + phone);
+            } else {
+                const email = document.getElementById('recoveryEmail').value;
+                showModalSuccess('OTP resent to ' + email);
+            }
+            
+            document.getElementById('recoveryOtp1').focus();
+            startRecoveryCountdown();
+        }
+
+        function moveToNextRecovery(current, nextId) {
+            if (current.value.length === 1) {
+                if (nextId) {
+                    document.getElementById(nextId).focus();
+                }
+            }
+        }
+
+        function getRecoveryOTPValue() {
+            let otp = '';
+            for (let i = 1; i <= 6; i++) {
+                otp += document.getElementById('recoveryOtp' + i).value;
+            }
+            return otp;
+        }
+
+        function verifyRecoveryOTP() {
+            const otp = getRecoveryOTPValue();
+            
+            if (otp.length !== 6) {
+                showModalError('Please enter complete 6-digit OTP');
+                return;
+            }
+            
+            // Simulate OTP verification (in real app, verify with backend)
+            showModalSuccess('OTP verified successfully!');
+            
+            // Move to step 3
+            setTimeout(() => {
+                currentRecoveryStep = 3;
+                updateRecoverySteps();
+            }, 1000);
+        }
+
+        function updateRecoverySteps() {
+            // Hide all steps
+            const step1 = document.getElementById('recoveryStep1');
+            const step2 = document.getElementById('recoveryStep2');
+            const step3 = document.getElementById('recoveryStep3');
+            
+            step1.style.display = 'none';
+            step2.style.display = 'none';
+            step3.style.display = 'none';
+            
+            // Update progress indicators
+            for (let i = 1; i <= 3; i++) {
+                const step = document.getElementById('step' + i);
+                step.classList.remove('active', 'completed');
+                
+                if (i < currentRecoveryStep) {
+                    step.classList.add('completed');
+                } else if (i === currentRecoveryStep) {
+                    step.classList.add('active');
+                }
+            }
+            
+            // Show current step
+            if (currentRecoveryStep === 1) {
+                step1.style.display = 'block';
+            } else if (currentRecoveryStep === 2) {
+                step2.style.display = 'block';
+            } else if (currentRecoveryStep === 3) {
+                step3.style.display = 'block';
+            }
+        }
+
+        function checkPasswordStrength() {
+            const password = document.getElementById('newPassword').value;
+            const strengthBar = document.getElementById('passwordStrength');
+            const strengthText = document.getElementById('passwordStrengthText');
+            
+            let strength = 0;
+            
+            if (password.length >= 8) strength++;
+            if (password.match(/[a-z]+/)) strength++;
+            if (password.match(/[A-Z]+/)) strength++;
+            if (password.match(/[0-9]+/)) strength++;
+            if (password.match(/[$@#&!]+/)) strength++;
+            
+            strengthBar.classList.remove('strength-weak', 'strength-medium', 'strength-strong');
+            
+            if (strength <= 2) {
+                strengthBar.classList.add('strength-weak');
+                strengthText.textContent = 'Weak password';
+                strengthText.style.color = '#ef4444';
+            } else if (strength <= 4) {
+                strengthBar.classList.add('strength-medium');
+                strengthText.textContent = 'Medium strength';
+                strengthText.style.color = '#f59e0b';
+            } else {
+                strengthBar.classList.add('strength-strong');
+                strengthText.textContent = 'Strong password';
+                strengthText.style.color = '#10b981';
+            }
+        }
+
+        function toggleNewPassword() {
+            const passwordInput = document.getElementById('newPassword');
+            const icon = event.target;
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                icon.textContent = '👁️';
+            }
+        }
+
+        function toggleConfirmPassword() {
+            const passwordInput = document.getElementById('confirmPassword');
+            const icon = event.target;
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                icon.textContent = '👁️';
+            }
+        }
+
+        function resetPassword() {
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (!newPassword || !confirmPassword) {
+                showModalError('Please fill in both password fields');
+                return;
+            }
+            
+            if (newPassword.length < 8) {
+                showModalError('Password must be at least 8 characters long');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                showModalError('Passwords do not match');
+                return;
+            }
+            
+            // Simulate password reset (in real app, send to backend)
+            showModalSuccess('Password reset successful!');
+            
+            setTimeout(() => {
+                closeForgotPasswordModal();
+                showSuccess('You can now login with your new password');
+            }, 2000);
+        }
+
+        // Social Login
+        function socialLogin(provider) {
+            // Redirect to social login
+            // window.location.href = `${provider}-login.html`;
+        }
+
+        // Go Back
+        function goBack() {
+            window.history.back();
+        }
+
+        // Go to Register
+        function goToRegister(event) {
+            event.preventDefault();
+            window.location.href = 'register.html';
+        }
+
+        // Check if user is already logged in
+        window.addEventListener('load', function() {
+            const savedPhone = localStorage.getItem('quickplay_phone');
+            if (savedPhone) {
+                // Extract country code and phone number
+                const countryCode = savedPhone.substring(0, savedPhone.length - 10);
+                const phone = savedPhone.substring(savedPhone.length - 10);
+                
+                document.getElementById('countryCode').value = countryCode;
+                document.getElementById('phone').value = phone;
+                document.getElementById('rememberMe').checked = true;
+            }
+        });
+    </script>
+</body>
+</html>

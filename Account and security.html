@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Play - Account Security</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(180deg, #0a1628 0%, #162447 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: linear-gradient(180deg, #0d1b2a 0%, #1b263b 100%);
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 80px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(180deg, #0a1628 0%, #162447 100%);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(255, 165, 0, 0.3);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            background: rgba(255, 165, 0, 0.15);
+            border: 2px solid #ffa500;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #ffa500;
+            font-size: 20px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 165, 0, 0.25);
+            transform: scale(1.05);
+        }
+
+        .header-title {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .security-icon {
+            color: #ffa500;
+            font-size: 24px;
+        }
+
+        /* Security Status Card */
+        .security-status {
+            margin: 20px;
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(22, 163, 74, 0.15) 100%);
+            border: 2px solid rgba(34, 197, 94, 0.4);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .status-icon {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+
+        .status-title {
+            color: #22c55e;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .status-description {
+            color: #94a3b8;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .security-score {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .score-label {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .score-value {
+            color: #22c55e;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        /* Security Settings */
+        .security-content {
+            padding: 0 20px;
+        }
+
+        .security-section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            color: #94a3b8;
+            font-size: 13px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            padding-left: 5px;
+        }
+
+        .security-item {
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid rgba(148, 163, 184, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .security-item:hover {
+            background: rgba(30, 41, 59, 0.7);
+            border-color: rgba(255, 165, 0, 0.5);
+            transform: translateX(5px);
+        }
+
+        .item-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .item-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            background: rgba(255, 165, 0, 0.15);
+            border: 2px solid rgba(255, 165, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .item-icon.success {
+            background: rgba(34, 197, 94, 0.15);
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        .item-icon.warning {
+            background: rgba(234, 179, 8, 0.15);
+            border-color: rgba(234, 179, 8, 0.3);
+        }
+
+        .item-icon.danger {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .item-text-group {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .item-text {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .item-subtitle {
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        .item-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .status-badge.active {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.5);
+            color: #22c55e;
+        }
+
+        .status-badge.inactive {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            color: #ef4444;
+        }
+
+        .status-badge.pending {
+            background: rgba(234, 179, 8, 0.2);
+            border: 1px solid rgba(234, 179, 8, 0.5);
+            color: #eab308;
+        }
+
+        .arrow-icon {
+            color: #94a3b8;
+            font-size: 18px;
+        }
+
+        /* Activity Log */
+        .activity-log {
+            margin: 20px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid rgba(148, 163, 184, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .log-title {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .log-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .log-item:last-child {
+            border-bottom: none;
+        }
+
+        .log-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 165, 0, 0.15);
+            border: 2px solid rgba(255, 165, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .log-content {
+            flex: 1;
+        }
+
+        .log-action {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .log-details {
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        .log-time {
+            color: #64748b;
+            font-size: 11px;
+            margin-top: 3px;
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 56px;
+            height: 30px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(148, 163, 184, 0.3);
+            transition: .3s;
+            border-radius: 30px;
+            border: 2px solid rgba(148, 163, 184, 0.2);
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 2px;
+            bottom: 2px;
+            background: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background: linear-gradient(135deg, #ffa500 0%, #ff8c00 100%);
+            border-color: #ffa500;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(180deg, #0d1b2a 0%, #1b263b 100%);
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 380px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 165, 0, 0.3);
+            animation: slideUp 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+
+        .modal-title {
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .modal-text {
+            color: #94a3b8;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+
+        .cancel-btn {
+            background: rgba(148, 163, 184, 0.2);
+            border: 2px solid rgba(148, 163, 184, 0.3);
+            color: white;
+        }
+
+        .cancel-btn:hover {
+            background: rgba(148, 163, 184, 0.3);
+        }
+
+        .confirm-btn {
+            background: linear-gradient(135deg, #ffa500 0%, #ff8c00 100%);
+            color: white;
+        }
+
+        .confirm-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 165, 0, 0.5);
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            display: block;
+            color: #e2e8f0;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid rgba(148, 163, 184, 0.2);
+            border-radius: 10px;
+            color: white;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #ffa500;
+            background: rgba(30, 41, 59, 0.8);
+        }
+
+        .otp-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .otp-input {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid rgba(148, 163, 184, 0.2);
+            border-radius: 10px;
+            color: white;
+        }
+
+        .otp-input:focus {
+            outline: none;
+            border-color: #ffa500;
+            background: rgba(30, 41, 59, 0.8);
+        }
+
+        .info-box {
+            background: rgba(59, 130, 246, 0.1);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            border-radius: 10px;
+            padding: 12px;
+            margin-top: 15px;
+        }
+
+        .info-box-text {
+            color: #60a5fa;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .device-item {
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid rgba(148, 163, 184, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .device-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .device-name {
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .device-current {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.5);
+            color: #22c55e;
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .device-info {
+            color: #94a3b8;
+            font-size: 12px;
+            margin-bottom: 3px;
+        }
+
+        .device-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .device-btn {
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s;
+        }
+
+        .device-btn.revoke {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            color: #ef4444;
+        }
+
+        .device-btn.revoke:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 480px;
+            width: 100%;
+            background: linear-gradient(180deg, #0a1628 0%, #000000 100%);
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            border-top: 2px solid rgba(255, 165, 0, 0.3);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 5px 15px;
+            text-decoration: none;
+        }
+
+        .nav-item.active {
+            color: #ffa500;
+        }
+
+        .nav-item:hover {
+            color: #ffa500;
+            transform: translateY(-2px);
+        }
+
+        .nav-icon {
+            font-size: 24px;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <a href="user.html" class="back-btn">←</a>
+                <div class="header-title">Account Security</div>
+            </div>
+            <div class="security-icon">🛡️</div>
+        </div>
+
+        <!-- Security Status Card -->
+        <div class="security-status">
+            <div class="status-icon">✅</div>
+            <div class="status-title">Account Protected</div>
+            <div class="status-description">
+                Your account is well protected with multiple security layers enabled
+            </div>
+            <div class="security-score">
+                <span class="score-label">Security Score</span>
+                <span class="score-value">85/100</span>
+            </div>
+        </div>
+
+        <!-- Security Settings -->
+        <div class="security-content">
+            <!-- Authentication -->
+            <div class="security-section">
+                <div class="section-title">Authentication</div>
+                
+                <div class="security-item" onclick="openPasswordChange()">
+                    <div class="item-left">
+                        <div class="item-icon success">🔒</div>
+                        <div class="item-text-group">
+                            <div class="item-text">Password</div>
+                            <div class="item-subtitle">Last changed 30 days ago</div>
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <span class="status-badge active">Strong</span>
+                        <span class="arrow-icon">›</span>
+                    </div>
+                </div>
+
+                <div class="security-item" onclick="openTwoFactorAuth()">
+                    <div class="item-left">
+                        <div class="item-icon warning">🔐</div>
+                        <div class="item-text-group">
+                            <div class="item-text">Two-Factor Authentication</div>
+                            <div class="item-subtitle">Add extra security layer</div>
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <span class="status-badge inactive">Off</span>
+                        <span class="arrow-icon">›</span>
+                    </div>
+                </div>
+
+                <div class="security-item" onclick="openBiometric()">
+                    <div class="item-left">
+                        <div class="item-icon success">👆</div>
+                        <div class="item-text-group">
+                            <div class="item-text">Biometric Login</div>
+                            <div class="item-subtitle">Fingerprint/Face ID</div>
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <label class="toggle-switch" onclick="event.stopPropagation()">
+                            <input type="checkbox" id="biometricToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Access -->
+            <div class="security-section">
+                <div class="section-title">Account Access</div>
+                
+                <div class="security-item" onclick="openActiveDevices()">
+                    <div class="item-left">
+                        <div class="item-icon">📱</div>
+                        <div class="item-text-group">
+                            <div class="item-text">Active Devices</div>
+                            <div class="item-subtitle">3 devices logged in</div>
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <span class="arrow-icon">›</span>
+                    </div>
+                </div>
+
+                <div class="security-item" onclick="openLoginHistory()">
+                    <div class="item-left">
+                        <div class="item-icon">📊</div>
+                        <div class="item-text-group">
+                            <div class="item-text">Login History</div>
+                            <div class="item-subtitle">View recent activity</div>
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <span class="arrow-icon">›</span>
+                    </div>
+                </div>
+
+                <div class="security-item">
+                    <div class="item-left">
+                        <div class="item-icon">🔔</div>
+                        <div class="item-text-group">
+                            <div class="item-text">Login Alerts</div>
+                            <div class="item-subtitle">Get notified of new logins</div>
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <label class="toggle-switch" onclick="event.stopPropagation()">
+                            <input type="checkbox" id="loginAlertsToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data & Privacy -->
+            <div class="security-section">
+                <div class="section-title">Data & Privacy</div>
+                
+                <div class="security-item" onclick="openDataDownload()">
+                    <div class="item-left">
+                        <div class="item-icon">💾</div>
+                        <div class="item-text-group">
+                            <div class="item-text">Download Data</div>
+                            <div class="item-subtitle">Get a copy of your data</div>
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <span class="arrow-icon">›</span>
+                    </div>
+                </div>
+
+                <div class="security-item" onclick="openDeleteAccount()">
+                    <div class="item-left">
+                        <div class="item-icon danger">🗑️</div>
+                        <div class="item-text-group">
+                            <div class="item-text">Delete Account</div>
+                            <div class="item-subtitle">Permanently delete account</div>
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <span class="arrow-icon">›</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity Log -->
+        <div class="activity-log">
+            <div class="log-title">Recent Security Activity</div>
+            
+            <div class="log-item">
+                <div class="log-icon">✅</div>
+                <div class="log-content">
+                    <div class="log-action">Successful Login</div>
+                    <div class="log-details">Chrome on Windows • 192.168.1.1</div>
+                    <div class="log-time">2 hours ago</div>
+                </div>
+            </div>
+
+            <div class="log-item">
+                <div class="log-icon">🔒</div>
+                <div class="log-content">
+                    <div class="log-action">Password Changed</div>
+                    <div class="log-details">Successfully updated</div>
+                    <div class="log-time">30 days ago</div>
+                </div>
+            </div>
+
+            <div class="log-item">
+                <div class="log-icon">📧</div>
+                <div class="log-content">
+                    <div class="log-action">Email Verified</div>
+                    <div class="log-details">user@example.com</div>
+                    <div class="log-time">45 days ago</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="games.html" class="nav-item">
+                <div class="nav-icon">🎮</div>
+                <div class="nav-label">Games</div>
+            </a>
+
+            <a href="promotion.html" class="nav-item">
+                <div class="nav-icon">📢</div>
+                <div class="nav-label">Promotion</div>
+            </a>
+
+            <a href="wallet.html" class="nav-item">
+                <div class="nav-icon">💰</div>
+                <div class="nav-label">Wallet</div>
+            </a>
+
+            <a href="user.html" class="nav-item active">
+                <div class="nav-icon">👤</div>
+                <div class="nav-label">User</div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div class="modal" id="passwordModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-icon">🔒</div>
+                <div class="modal-title">Change Password</div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Current Password</label>
+                <input type="password" class="form-input" id="currentPassword" placeholder="Enter current password">
+            </div>
+            <div class="form-group">
+                <label class="form-label">New Password</label>
+                <input type="password" class="form-input" id="newPassword" placeholder="Enter new password">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Confirm Password</label>
+                <input type="password" class="form-input" id="confirmPassword" placeholder="Confirm new password">
+            </div>
+            <div class="info-box">
+                <div class="info-box-text">
+                    ℹ️ Password must be at least 8 characters with uppercase, lowercase, numbers, and special characters
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel-btn" onclick="closePasswordChange()">Cancel</button>
+                <button class="modal-btn confirm-btn" onclick="savePassword()">Change Password</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Two-Factor Authentication Modal -->
+    <div class="modal" id="twoFactorModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-icon">🔐</div>
+                <div class="modal-title">Enable 2FA</div>
+                <div class="modal-text">Add an extra layer of security to your account</div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Enter Your Phone Number</label>
+                <input type="tel" class="form-input" id="phoneNumber" placeholder="+91 9876543210">
+            </div>
+            <div class="info-box">
+                <div class="info-box-text">
+                    📱 We'll send you a verification code via SMS whenever you login
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel-btn" onclick="closeTwoFactorAuth()">Cancel</button>
+                <button class="modal-btn confirm-btn" onclick="sendOTP()">Send OTP</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- OTP Verification Modal -->
+    <div class="modal" id="otpModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-icon">📲</div>
+                <div class="modal-title">Enter OTP</div>
+                <div class="modal-text">We've sent a 6-digit code to your phone</div>
+            </div>
+            <div class="otp-container">
+                <input type="text" class="otp-input" maxlength="1" id="otp1">
+                <input type="text" class="otp-input" maxlength="1" id="otp2">
+                <input type="text" class="otp-input" maxlength="1" id="otp3">
+                <input type="text" class="otp-input" maxlength="1" id="otp4">
+                <input type="text" class="otp-input" maxlength="1" id="otp5">
+                <input type="text" class="otp-input" maxlength="1" id="otp6">
+            </div>
+            <div class="info-box">
+                <div class="info-box-text">
+                    ⏳ OTP is valid for 5 minutes. Didn't receive it? <a href="#" onclick="resendOTP()">Resend</a>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel-btn" onclick="closeOTPModal()">Cancel</button>
+                <button class="modal-btn confirm-btn" onclick="verifyOTP()">Verify OTP</button>
+
+            </div>
+        </div>
+    </div>
+    <script>
+        // Open and Close Password Change Modal
+        function openPasswordChange() {
+            document.getElementById('passwordModal').classList.add('show');
+        }
+        function closePasswordChange() {
+            document.getElementById('passwordModal').classList.remove('show');
+        }
+        function savePassword() {
+            // Add password saving logic here
+            alert('Password changed successfully!');
+            closePasswordChange();
+        }
+
+        // Open and Close Two-Factor Authentication Modal
+        function openTwoFactorAuth() {
+            document.getElementById('twoFactorModal').classList.add('show');
+        }
+        function closeTwoFactorAuth() {
+            document.getElementById('twoFactorModal').classList.remove('show');
+        }
+        function sendOTP() {
+            // Add OTP sending logic here
+            alert('OTP sent to your phone!');
+            closeTwoFactorAuth();
+            openOTPModal();
+        }
+
+        // Open and Close OTP Modal
+        function openOTPModal() {
+            document.getElementById('otpModal').classList.add('show');
+        }
+        function closeOTPModal() {
+            document.getElementById('otpModal').classList.remove('show');
+        }
+        function verifyOTP() {
+            // Add OTP verification logic here
+            alert('OTP verified successfully!');
+            closeOTPModal();
+        }
+        function resendOTP() {
+            // Add OTP resending logic here
+            alert('OTP resent to your phone!');
+        }
+    </script>
+</body>
+</html>

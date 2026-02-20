@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickPLAY Support Bot</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #00d4ff;
+            --secondary: #0077ff;
+            --danger: #ff4757;
+            --warning: #ff9f1a;
+            --success: #2ed573;
+            --dark: #0f2027;
+            --light: #ffffff;
+            --gray: #6c757d;
+            --card-bg: rgba(15, 32, 39, 0.95);
+        }
+
+        body {
+            background: linear-gradient(135deg, #0c2461, #1e3799);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Chatbot Container */
+        .chatbot-container {
+            width: 100%;
+            max-width: 500px;
+            height: 90vh;
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--primary);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Chat Header */
+        .chat-header {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: white;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-avatar {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--primary);
+        }
+
+        .header-info h3 {
+            font-size: 18px;
+            margin-bottom: 3px;
+        }
+
+        .header-info p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Chat Body */
+        .chat-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Messages */
+        .message {
+            max-width: 85%;
+            padding: 12px 15px;
+            border-radius: 18px;
+            animation: fadeIn 0.3s ease;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.bot {
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-bottom-left-radius: 5px;
+            color: white;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message-time {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-btn:hover {
+            background: var(--primary);
+            color: var(--dark);
+            transform: translateY(-2px);
+        }
+
+        .action-btn i {
+            font-size: 14px;
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            display: flex;
+            gap: 5px;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
+            width: fit-content;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary);
+            opacity: 0.4;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-indicator span:nth-child(1) { animation-delay: 0s; }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 100% { opacity: 0.4; transform: translateY(0); }
+            50% { opacity: 1; transform: translateY(-5px); }
+        }
+
+        /* Chat Input */
+        .chat-input-container {
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .chat-input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .chat-input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border-radius: 25px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
+        }
+
+        .input-icons {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 18px;
+            padding: 5px;
+            transition: all 0.3s;
+        }
+
+        .icon-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .send-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+        }
+
+        /* Upload Area */
+        .upload-area {
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .upload-area.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .upload-label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--primary);
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .file-input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .file-input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 14px;
+        }
+
+        .upload-btn {
+            padding: 10px 20px;
+            background: var(--primary);
+            color: var(--dark);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .upload-btn:hover {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .upload-preview {
+            margin-top: 10px;
+            max-width: 150px;
+            border-radius: 8px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .upload-preview img {
+            width: 100%;
+            height: auto;
+        }
+
+        /* Quick Reply Buttons */
+        .quick-reply {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .reply-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+        }
+
+        .reply-btn:hover {
+            background: var(--primary);
+            color: var(--dark);
+        }
+
+        /* Notification */
+        .notification {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(45deg, var(--success), #27ae60);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+            max-width: 300px;
+            display: none;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        /* Bottom Menu */
+        .bottom-menu {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.4);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .menu-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 8px 15px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            color: var(--primary);
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .menu-item i {
+            font-size: 18px;
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 480px) {
+            .chatbot-container {
+                height: 95vh;
+                border-radius: 15px;
+            }
+            
+            .chat-header {
+                padding: 12px 15px;
+            }
+            
+            .chat-body {
+                padding: 15px;
+            }
+            
+            .message {
+                max-width: 90%;
+                padding: 10px 12px;
+                font-size: 14px;
+            }
+            
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+            
+            .chat-input-container {
+                padding: 12px;
+            }
+            
+            .send-btn {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .bottom-menu {
+                padding: 8px 5px;
+            }
+            
+            .menu-item {
+                padding: 6px 10px;
+                font-size: 11px;
+            }
+            
+            .menu-item i {
+                font-size: 16px;
+            }
+        }
+
+        /* Scrollbar Styling */
+        .chat-body::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-body::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+
+        .chat-body::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 3px;
+        }
+
+        .chat-body::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Chatbot Container -->
+    <div class="chatbot-container">
+        <!-- Chat Header -->
+        <div class="chat-header">
+            <div class="header-left">
+                <div class="chat-avatar">🤖</div>
+                <div class="header-info">
+                    <h3>QuickPLAY Support</h3>
+                    <p>AI Assistant • 24/7 Available</p>
+                </div>
+            </div>
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span>Online</span>
+            </div>
+        </div>
+
+        <!-- Chat Body -->
+        <div class="chat-body" id="chat-body">
+            <!-- Initial Bot Message -->
+            <div class="message bot">
+                <div>👋 Hello! Welcome to <strong>QuickPLAY Support</strong>.</div>
+                <div style="margin-top: 8px;">I'm here to help you with gaming issues, deposits, withdrawals, and account problems.</div>
+                
+                <div class="quick-actions">
+                    <button class="action-btn" data-action="deposit">
+                        <i class="fas fa-credit-card"></i>
+                        Deposit Problem
+                    </button>
+                    <button class="action-btn" data-action="withdrawal">
+                        <i class="fas fa-money-bill-wave"></i>
+                        Withdrawal Issue
+                    </button>
+                    <button class="action-btn" data-action="bonus">
+                        <i class="fas fa-gift"></i>
+                        Bonus Not Received
+                    </button>
+                    <button class="action-btn" data-action="account">
+                        <i class="fas fa-user-lock"></i>
+                        Account Banned
+                    </button>
+                    <button class="action-btn" data-action="game">
+                        <i class="fas fa-gamepad"></i>
+                        Game Issue
+                    </button>
+                    <button class="action-btn" data-action="verification">
+                        <i class="fas fa-id-card"></i>
+                        KYC Verification
+                    </button>
+                </div>
+                <div class="message-time">Just now</div>
+            </div>
+        </div>
+
+        <!-- Upload Area -->
+        <div class="upload-area" id="upload-area">
+            <label class="upload-label">📎 Upload Proof (Screenshot/Transaction ID)</label>
+            <div class="file-input-wrapper">
+                <input type="file" id="file-input" class="file-input" accept="image/*,.pdf,.png,.jpg,.jpeg">
+                <button id="upload-btn" class="upload-btn">
+                    <i class="fas fa-upload"></i> Upload
+                </button>
+            </div>
+            <div class="upload-preview" id="upload-preview">
+                <img id="preview-image" src="" alt="Preview">
+            </div>
+        </div>
+
+        <!-- Chat Input -->
+        <div class="chat-input-container">
+            <div class="chat-input-wrapper">
+                <input type="text" class="chat-input" id="chat-input" placeholder="Type your message...">
+                <div class="input-icons">
+                    <button class="icon-btn" id="attach-btn">
+                        <i class="fas fa-paperclip"></i>
+                    </button>
+                    <button class="icon-btn" id="emoji-btn">
+                        <i class="fas fa-smile"></i>
+                    </button>
+                </div>
+            </div>
+            <button class="send-btn" id="send-btn">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+
+        <!-- Bottom Menu -->
+        <div class="bottom-menu">
+            <div class="menu-item active" data-menu="chat">
+                <i class="fas fa-comments"></i>
+                <span>Chat</span>
+            </div>
+            <div class="menu-item" data-menu="ticket">
+                <i class="fas fa-ticket-alt"></i>
+                <span>Ticket</span>
+            </div>
+            <div class="menu-item" data-menu="history">
+                <i class="fas fa-history"></i>
+                <span>History</span>
+            </div>
+            <div class="menu-item" data-menu="help">
+                <i class="fas fa-question-circle"></i>
+                <span>Help</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <div>
+            <strong id="notification-title"></strong>
+            <div id="notification-message" style="font-size: 12px; opacity: 0.9;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Chatbot Configuration
+        const chatbot = {
+            currentTopic: null,
+            conversation: [],
+            userData: {
+                name: 'Player',
+                balance: 0,
+                lastDeposit: 0,
+                lastWithdrawal: 0
+            }
+        };
+
+        // DOM Elements
+        const chatBody = document.getElementById('chat-body');
+        const chatInput = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('send-btn');
+        const attachBtn = document.getElementById('attach-btn');
+        const uploadArea = document.getElementById('upload-area');
+        const fileInput = document.getElementById('file-input');
+        const uploadBtn = document.getElementById('upload-btn');
+        const previewImage = document.getElementById('preview-image');
+        const uploadPreview = document.getElementById('upload-preview');
+        const notification = document.getElementById('notification');
+        const notificationTitle = document.getElementById('notification-title');
+        const notificationMessage = document.getElementById('notification-message');
+        const menuItems = document.querySelectorAll('.menu-item');
+
+        // Knowledge Base for Gaming Site Issues
+        const knowledgeBase = {
+            deposit: {
+                questions: [
+                    "Money not added",
+                    "Deposit failed",
+                    "How long deposit takes",
+                    "Minimum deposit",
+                    "Payment methods"
+                ],
+                answers: [
+                    "Deposits process within 5 minutes. Please check transaction ID.",
+                    "Failed deposits auto-refund in 24h. Check bank statement.",
+                    "Instant for e-wallets, 5-30 min for cards, 10 min for crypto.",
+                    "Minimum deposit is $10. Maximum $5,000 per transaction.",
+                    "We accept Visa/Mastercard, Skrill, Neteller, Bitcoin, Ethereum."
+                ],
+                followUp: "Please provide transaction ID for immediate help."
+            },
+            withdrawal: {
+                questions: [
+                    "Withdrawal pending",
+                    "Withdrawal declined",
+                    "Withdrawal limit",
+                    "Withdrawal fee",
+                    "KYC needed"
+                ],
+                answers: [
+                    "Withdrawals take 24-48h. VIP: 12h.",
+                    "Declined due to KYC verification or bonus wagering.",
+                    "Max $10,000/day verified, $2,000/day unverified.",
+                    "No fee for >$50. $5 fee for smaller amounts.",
+                    "KYC required for first withdrawal and >$2,000 transactions."
+                ],
+                followUp: "Upload withdrawal screenshot and ID for verification."
+            },
+            bonus: {
+                questions: [
+                    "Welcome bonus missing",
+                    "Free spins not given",
+                    "Wagering requirements",
+                    "Promo code invalid",
+                    "Bonus disappeared"
+                ],
+                answers: [
+                    "Welcome bonus needs $20+ deposit. Claim within 24h.",
+                    "Free spins credited within 1h after qualifying deposit.",
+                    "35x wagering on bonus. 60 days to complete.",
+                    "Promo codes case-sensitive. Check spelling.",
+                    "Bonus expires after 7 days if wagering not started."
+                ],
+                followUp: "Share bonus code and deposit proof for verification."
+            },
+            account: {
+                questions: [
+                    "Account suspended",
+                    "Can't login",
+                    "Password reset",
+                    "Account hacked",
+                    "Self-exclusion"
+                ],
+                answers: [
+                    "Suspensions: multiple accounts or suspicious activity.",
+                    "Reset password via email. Check spam folder.",
+                    "Reset link valid 1h. Use same device for security.",
+                    "Contact support immediately. We'll secure account.",
+                    "Self-exclusion: Account settings → Responsible gaming."
+                ],
+                followUp: "Security team will review within 24h."
+            },
+            game: {
+                questions: [
+                    "Game crashed",
+                    "Winnings not paid",
+                    "Game not loading",
+                    "Game fairness",
+                    "Technical issue"
+                ],
+                answers: [
+                    "Clear cache or try different browser.",
+                    "Winnings credited instantly. Check game history.",
+                    "Check internet. Update browser. Try mobile app.",
+                    "All games RNG certified. Audit reports available.",
+                    "Technical issues fixed within 1-2h. We compensate delays."
+                ],
+                followUp: "Provide game ID, time, and screenshot of issue."
+            },
+            verification: {
+                questions: [
+                    "KYC documents",
+                    "Verification time",
+                    "Document rejected",
+                    "Age verification",
+                    "Address proof"
+                ],
+                answers: [
+                    "Need: ID, selfie, address proof, payment method proof.",
+                    "Verification: 1-24h business days.",
+                    "Rejected if blurry, expired, or incomplete.",
+                    "Must be 18+ (21+ in some regions).",
+                    "Utility bill or bank statement <3 months old."
+                ],
+                followUp: "Upload documents for instant verification help."
+            }
+        };
+
+        // Initialize Chatbot
+        function initChatbot() {
+            setupEventListeners();
+            loadUserData();
+        }
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Send message
+            sendBtn.addEventListener('click', sendMessage);
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendMessage();
+            });
+
+            // Attach file
+            attachBtn.addEventListener('click', () => {
+                uploadArea.classList.toggle('active');
+                scrollToBottom();
+            });
+
+            // File handling
+            fileInput.addEventListener('change', handleFileSelect);
+            uploadBtn.addEventListener('click', uploadFile);
+
+            // Quick action buttons
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.action-btn')) {
+                    const action = e.target.closest('.action-btn').dataset.action;
+                    handleQuickAction(action);
+                }
+                
+                if (e.target.closest('.reply-btn')) {
+                    const text = e.target.closest('.reply-btn').textContent;
+                    sendUserMessage(text);
+                }
+            });
+
+            // Menu items
+            menuItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    menuItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    handleMenuClick(item.dataset.menu);
+                });
+            });
+        }
+
+        // Load User Data
+        function loadUserData() {
+            // Try to get user data from localStorage or simulate
+            const savedData = localStorage.getItem('quickplay_user');
+            if (savedData) {
+                chatbot.userData = JSON.parse(savedData);
+            }
+        }
+
+        // Send Message
+        function sendMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+            
+            sendUserMessage(message);
+            chatInput.value = '';
+        }
+
+        // Send User Message
+        function sendUserMessage(message) {
+            addMessage(message, 'user');
+            showTyping();
+            
+            setTimeout(() => {
+                hideTyping();
+                processMessage(message);
+            }, 800 + Math.random() * 800);
+        }
+
+        // Add Message to Chat
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            messageDiv.innerHTML = `
+                <div>${text}</div>
+                <div class="message-time">${time}</div>
+            `;
+            
+            chatBody.appendChild(messageDiv);
+            scrollToBottom();
+            
+            // Save to conversation
+            chatbot.conversation.push({
+                sender,
+                text,
+                time,
+                topic: chatbot.currentTopic
+            });
+        }
+
+        // Show Typing Indicator
+        function showTyping() {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator';
+            typingDiv.id = 'typing-indicator';
+            typingDiv.innerHTML = `<span></span><span></span><span></span>`;
+            chatBody.appendChild(typingDiv);
+            scrollToBottom();
+        }
+
+        // Hide Typing Indicator
+        function hideTyping() {
+            const typing = document.getElementById('typing-indicator');
+            if (typing) typing.remove();
+        }
+
+        // Process User Message
+        function processMessage(message) {
+            const lowerMsg = message.toLowerCase();
+            
+            // Check greetings
+            if (/(hi|hello|hey|sup)/i.test(lowerMsg)) {
+                showGreeting();
+                return;
+            }
+            
+            // Check for thank you
+            if (/(thanks|thank you|ty)/i.test(lowerMsg)) {
+                addMessage("You're welcome! Is there anything else I can help you with?", 'bot');
+                showQuickReplies(['Deposit problem', 'Withdrawal issue', 'Bonus not working']);
+                return;
+            }
+            
+            // Check for balance
+            if (/(balance|money|fund)/i.test(lowerMsg)) {
+                addMessage(`Your account balance information would be available in your dashboard. For specific transaction details, please check your transaction history.`, 'bot');
+                return;
+            }
+            
+            // Detect issue type
+            if (/(deposit|add money|add funds)/i.test(lowerMsg)) {
+                handleIssue('deposit', message);
+            } else if (/(withdraw|cashout|withdrawal)/i.test(lowerMsg)) {
+                handleIssue('withdrawal', message);
+            } else if (/(bonus|promo|free spin|reward)/i.test(lowerMsg)) {
+                handleIssue('bonus', message);
+            } else if (/(account|banned|suspended|locked)/i.test(lowerMsg)) {
+                handleIssue('account', message);
+            } else if (/(game|crash|bug|technical)/i.test(lowerMsg)) {
+                handleIssue('game', message);
+            } else if (/(kyc|verify|verification|document)/i.test(lowerMsg)) {
+                handleIssue('verification', message);
+            } else {
+                // Default response
+                addMessage("I understand you need assistance. Could you please be more specific about your issue?", 'bot');
+                showQuickReplies([
+                    'Money deposit problem',
+                    'Withdrawal not received',
+                    'Bonus missing',
+                    'Account issue',
+                    'Game problem'
+                ]);
+            }
+        }
+
+        // Show Greeting
+        function showGreeting() {
+            addMessage("Hello! I'm your QuickPLAY support assistant. How can I help you today?", 'bot');
+            
+            const actions = [
+                {icon: 'fa-credit-card', text: 'Deposit Problem', action: 'deposit'},
+                {icon: 'fa-money-bill-wave', text: 'Withdrawal Issue', action: 'withdrawal'},
+                {icon: 'fa-gift', text: 'Bonus Missing', action: 'bonus'},
+                {icon: 'fa-user-lock', text: 'Account Problem', action: 'account'},
+                {icon: 'fa-gamepad', text: 'Game Issue', action: 'game'},
+                {icon: 'fa-id-card', text: 'KYC Help', action: 'verification'}
+            ];
+            
+            let html = '<div class="quick-actions">';
+            actions.forEach(action => {
+                html += `
+                    <button class="action-btn" data-action="${action.action}">
+                        <i class="fas ${action.icon}"></i>
+                        ${action.text}
+                    </button>
+                `;
+            });
+            html += '</div>';
+            
+            const botMessage = document.createElement('div');
+            botMessage.className = 'message bot';
+            botMessage.innerHTML = html + '<div class="message-time">Just now</div>';
+            chatBody.appendChild(botMessage);
+            scrollToBottom();
+        }
+
+        // Handle Quick Action
+        function handleQuickAction(action) {
+            const actionTexts = {
+                deposit: "I need help with deposit",
+                withdrawal: "I have withdrawal problem",
+                bonus: "My bonus is missing",
+                account: "My account has issue",
+                game: "Game is not working",
+                verification: "Need KYC verification help"
+            };
+            
+            sendUserMessage(actionTexts[action] || "I need help");
+        }
+
+        // Handle Issue
+        function handleIssue(issueType, userMessage) {
+            chatbot.currentTopic = issueType;
+            const kb = knowledgeBase[issueType];
+            
+            if (!kb) {
+                addMessage("I'll help you with that. Please describe your issue in detail.", 'bot');
+                return;
+            }
+            
+            // Find matching question
+            let response = "";
+            for (let i = 0; i < kb.questions.length; i++) {
+                if (userMessage.toLowerCase().includes(kb.questions[i].toLowerCase())) {
+                    response = kb.answers[i];
+                    break;
+                }
+            }
+            
+            if (!response) {
+                response = `I understand you're having ${issueType} issues. Here's what I can tell you:\n\n`;
+                response += kb.answers.slice(0, 2).join('\n\n');
+            }
+            
+            response += `\n\n${kb.followUp}`;
+            
+            addMessage(response, 'bot');
+            
+            // Show relevant options
+            showIssueOptions(issueType);
+            
+            // Show upload area for relevant issues
+            if (['deposit', 'withdrawal', 'bonus', 'game', 'verification'].includes(issueType)) {
+                setTimeout(() => {
+                    uploadArea.classList.add('active');
+                    scrollToBottom();
+                }, 300);
+            }
+        }
+
+        // Show Issue Options
+        function showIssueOptions(issueType) {
+            const options = {
+                deposit: ['Check transaction status', 'Upload deposit proof', 'Talk to agent'],
+                withdrawal: ['Check withdrawal status', 'Upload KYC documents', 'Cancel withdrawal'],
+                bonus: ['Check bonus eligibility', 'Upload bonus code', 'Claim missing bonus'],
+                account: ['Account recovery', 'Security check', 'Contact support'],
+                game: ['Report bug', 'Check game history', 'Request compensation'],
+                verification: ['Upload documents', 'Check verification status', 'Expedite process']
+            };
+            
+            showQuickReplies(options[issueType] || ['Upload proof', 'Create ticket', 'Live chat']);
+        }
+
+        // Show Quick Reply Buttons
+        function showQuickReplies(replies) {
+            const quickReplyDiv = document.createElement('div');
+            quickReplyDiv.className = 'quick-reply';
+            
+            replies.forEach(reply => {
+                quickReplyDiv.innerHTML += `<button class="reply-btn">${reply}</button>`;
+            });
+            
+            const lastMessage = chatBody.lastElementChild;
+            lastMessage.appendChild(quickReplyDiv);
+            scrollToBottom();
+        }
+
+        // Handle File Selection
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    uploadPreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                uploadPreview.style.display = 'none';
+            }
+        }
+
+        // Upload File
+        function uploadFile() {
+            const file = fileInput.files[0];
+            if (!file) {
+                showNotification('Please select a file', 'Choose a screenshot or document to upload', 'warning');
+                return;
+            }
+            
+            if (file.size > 5 * 1024 * 1024) {
+                showNotification('File too large', 'Maximum file size is 5MB', 'danger');
+                return;
+            }
+            
+            showTyping();
+            
+            setTimeout(() => {
+                hideTyping();
+                
+                const fileType = file.type.startsWith('image/') ? 'image' : 'document';
+                addMessage(`✅ I've received your ${fileType} (${file.name}). Our support team will review it within 24 hours.`, 'bot');
+                
+                // Reset upload
+                fileInput.value = '';
+                uploadPreview.style.display = 'none';
+                uploadArea.classList.remove('active');
+                
+                showNotification('Upload Successful', 'File received. We will review it soon.', 'success');
+                
+                // Ask follow-up
+                setTimeout(() => {
+                    addMessage('Do you have any additional information to share about this issue?', 'bot');
+                }, 1000);
+                
+            }, 1500);
+        }
+
+        // Handle Menu Click
+        function handleMenuClick(menu) {
+            switch(menu) {
+                case 'ticket':
+                    createSupportTicket();
+                    break;
+                case 'history':
+                    showChatHistory();
+                    break;
+                case 'help':
+                    showHelpTopics();
+                    break;
+            }
+        }
+
+        // Create Support Ticket
+        function createSupportTicket() {
+            addMessage("🎫 Creating a support ticket... Please describe your issue:", 'bot');
+            
+            setTimeout(() => {
+                const ticketId = 'TICKET-' + Math.random().toString(36).substr(2, 8).toUpperCase();
+                addMessage(`✅ Support ticket #${ticketId} created! Our team will contact you within 24 hours. You can also email support@quickplay.com`, 'bot');
+                
+                showNotification('Ticket Created', `Ticket #${ticketId} submitted successfully`, 'success');
+            }, 1000);
+        }
+
+        // Show Chat History
+        function showChatHistory() {
+            if (chatbot.conversation.length === 0) {
+                addMessage("No conversation history yet. Start chatting to see history here.", 'bot');
+                return;
+            }
+            
+            addMessage(`📜 Conversation History (${chatbot.conversation.length} messages):`, 'bot');
+            
+            // Show last 5 messages
+            const recent = chatbot.conversation.slice(-5);
+            recent.forEach(msg => {
+                const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `message ${msg.sender}`;
+                msgDiv.style.opacity = '0.8';
+                msgDiv.style.fontSize = '13px';
+                msgDiv.innerHTML = `
+                    <div>${msg.text}</div>
+                    <div class="message-time">${time}</div>
+                `;
+                chatBody.appendChild(msgDiv);
+            });
+        }
+
+        // Show Help Topics
+        function showHelpTopics() {
+            addMessage("📚 QuickPLAY Help Topics:", 'bot');
+            
+            const topics = [
+                "💳 Deposits: Minimum $10, instant processing",
+                "💸 Withdrawals: 24-48h processing, KYC required",
+                "🎁 Bonuses: 35x wagering, 7 day expiry",
+                "🔒 Account Security: 2FA available",
+                "🎮 Games: Provably fair, RNG certified",
+                "📋 KYC: Required for withdrawals >$2,000",
+                "⏰ Support: 24/7 via chat, email, phone"
+            ];
+            
+            topics.forEach(topic => {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'message bot';
+                msgDiv.style.background = 'rgba(255,255,255,0.05)';
+                msgDiv.style.marginTop = '5px';
+                msgDiv.innerHTML = `<div>${topic}</div>`;
+                chatBody.appendChild(msgDiv);
+            });
+        }
+
+        // Show Notification
+        function showNotification(title, message, type = 'success') {
+            notificationTitle.textContent = title;
+            notificationMessage.textContent = message;
+            
+            // Set color based on type
+            const colors = {
+                success: 'linear-gradient(45deg, #2ed573, #27ae60)',
+                warning: 'linear-gradient(45deg, #ff9f1a, #ffaf40)',
+                danger: 'linear-gradient(45deg, #ff4757, #ff3838)',
+                info: 'linear-gradient(45deg, #00d4ff, #0077ff)'
+            };
+            
+            notification.style.background = colors[type] || colors.info;
+            notification.style.display = 'flex';
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                    notification.style.animation = 'slideIn 0.3s ease';
+                }, 300);
+            }, 4000);
+        }
+
+        // Scroll to Bottom
+        function scrollToBottom() {
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        // Initialize on Load
+        window.addEventListener('load', initChatbot);
+        
+        // Auto-focus input
+        setTimeout(() => {
+            chatInput.focus();
+        }, 1000);
+    </script>
+</body>
+</html>

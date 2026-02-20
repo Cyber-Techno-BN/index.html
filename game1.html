@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chicken Trap</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(180deg, #0a1628 0%, #162447 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: linear-gradient(180deg, #0d1b2a 0%, #1b263b 100%);
+            min-height: 100vh;
+        }
+
+        .top-bar {
+            background: linear-gradient(180deg, #0a1628 0%, #162447 100%);
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(220, 38, 38, 0.4);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .back-button {
+            background: rgba(220, 38, 38, 0.2);
+            border: 2px solid #dc2626;
+            color: #dc2626;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .back-button:active {
+            transform: scale(0.95);
+            background: rgba(220, 38, 38, 0.3);
+        }
+
+        .game-title {
+            color: white;
+            font-size: 17px;
+            font-weight: bold;
+        }
+
+        .cash-display {
+            background: rgba(34, 197, 94, 0.15);
+            border: 2px solid #22c55e;
+            border-radius: 20px;
+            padding: 6px 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .cash-icon {
+            font-size: 16px;
+        }
+
+        .cash-amount {
+            color: #22c55e;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .game-stats {
+            background: rgba(10, 22, 40, 0.5);
+            padding: 8px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(220, 38, 38, 0.2);
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #94a3b8;
+            font-size: 11px;
+        }
+
+        .stat-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #22c55e;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .game-area {
+            padding: 10px 12px 15px 12px;
+        }
+
+        .message-display {
+            background: rgba(220, 38, 38, 0.15);
+            border: 2px solid #dc2626;
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+            margin-bottom: 10px;
+            min-height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .message-text {
+            color: #dc2626;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .message-text.success {
+            color: #22c55e;
+        }
+
+        .message-text.info {
+            color: #ffa500;
+        }
+
+        .multiplier-display {
+            text-align: center;
+            margin-bottom: 10px;
+            padding: 8px;
+            background: rgba(30, 41, 59, 0.3);
+            border-radius: 8px;
+        }
+
+        .multiplier-value {
+            font-size: 30px;
+            font-weight: bold;
+            color: #22c55e;
+            text-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+            line-height: 1;
+        }
+
+        .win-info {
+            margin-top: 6px;
+            display: flex;
+            justify-content: space-around;
+            gap: 10px;
+        }
+
+        .win-item {
+            flex: 1;
+        }
+
+        .win-label {
+            color: #94a3b8;
+            font-size: 10px;
+            margin-bottom: 2px;
+        }
+
+        .win-amount {
+            color: #ffa500;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .next-amount {
+            color: #22c55e;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .road-container {
+            background: rgba(30, 41, 59, 0.3);
+            border-radius: 8px;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+
+        .road-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 4px;
+        }
+
+        .road-tile {
+            aspect-ratio: 1;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(148, 163, 184, 0.2);
+            border: 2px solid rgba(148, 163, 184, 0.3);
+            min-height: 40px;
+        }
+
+        .road-tile.clickable {
+            background: rgba(255, 165, 0, 0.2);
+            border-color: #ffa500;
+            animation: glow 1.5s infinite;
+        }
+
+        .road-tile.clickable:active {
+            transform: scale(0.95);
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 8px rgba(255, 165, 0, 0.3); }
+            50% { box-shadow: 0 0 15px rgba(255, 165, 0, 0.6); }
+        }
+
+        .road-tile.safe {
+            background: rgba(34, 197, 94, 0.3);
+            border-color: #22c55e;
+        }
+
+        .road-tile.danger {
+            background: rgba(220, 38, 38, 0.3);
+            border-color: #dc2626;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+        }
+
+        .road-tile.chicken {
+            background: rgba(251, 191, 36, 0.4);
+            border-color: #fbbf24;
+            animation: bounce 0.6s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        .control-panel {
+            background: rgba(30, 41, 59, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            border: 2px solid rgba(220, 38, 38, 0.3);
+            margin-bottom: 10px;
+        }
+
+        .section-label {
+            color: #e2e8f0;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .bet-controls {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .min-max-btn {
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid rgba(148, 163, 184, 0.2);
+            color: white;
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .min-max-btn:active {
+            transform: scale(0.95);
+            background: rgba(220, 38, 38, 0.2);
+            border-color: #dc2626;
+        }
+
+        .bet-input-container {
+            flex: 1;
+            position: relative;
+        }
+
+        .bet-input {
+            width: 100%;
+            background: rgba(10, 22, 40, 0.5);
+            border: 2px solid rgba(148, 163, 184, 0.3);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .bet-input:focus {
+            outline: none;
+            border-color: #dc2626;
+        }
+
+        .quick-bet-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .quick-bet-btn {
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid rgba(148, 163, 184, 0.2);
+            color: white;
+            padding: 8px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quick-bet-btn:active {
+            transform: scale(0.95);
+            background: rgba(220, 38, 38, 0.2);
+            border-color: #dc2626;
+        }
+
+        .difficulty-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .difficulty-btn {
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid rgba(148, 163, 184, 0.2);
+            color: white;
+            padding: 8px 6px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .difficulty-btn:active {
+            transform: scale(0.98);
+        }
+
+        .difficulty-btn.active {
+            background: rgba(220, 38, 38, 0.2);
+            border-color: #dc2626;
+            color: #dc2626;
+        }
+
+        .difficulty-name {
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 2px;
+        }
+
+        .difficulty-info {
+            font-size: 9px;
+            color: #94a3b8;
+        }
+
+        .difficulty-multiplier {
+            font-size: 10px;
+            color: #22c55e;
+            font-weight: bold;
+            margin-top: 2px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .play-button, .cashout-button {
+            flex: 1;
+            border: none;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .play-button {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+        }
+
+        .play-button:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        .play-button:disabled {
+            background: rgba(148, 163, 184, 0.3);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .cashout-button {
+            background: linear-gradient(135deg, #ffa500 0%, #ff8c00 100%);
+            box-shadow: 0 4px 15px rgba(255, 165, 0, 0.4);
+        }
+
+        .cashout-button:active {
+            transform: scale(0.98);
+        }
+
+        .game-records {
+            background: rgba(30, 41, 59, 0.3);
+            border-radius: 8px;
+            padding: 10px;
+            border: 2px solid rgba(220, 38, 38, 0.3);
+        }
+
+        .records-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .records-title {
+            color: #e2e8f0;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .clear-records {
+            background: rgba(220, 38, 38, 0.2);
+            border: 1px solid #dc2626;
+            color: #dc2626;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .clear-records:active {
+            transform: scale(0.95);
+        }
+
+        .records-list {
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .record-item {
+            background: rgba(10, 22, 40, 0.5);
+            border-radius: 5px;
+            padding: 7px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .record-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .record-info {
+            flex: 1;
+        }
+
+        .record-result {
+            font-size: 11px;
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+
+        .record-result.win {
+            color: #22c55e;
+        }
+
+        .record-result.loss {
+            color: #dc2626;
+        }
+
+        .record-details {
+            font-size: 9px;
+            color: #94a3b8;
+        }
+
+        .record-amount {
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .record-amount.win {
+            color: #22c55e;
+        }
+
+        .record-amount.loss {
+            color: #dc2626;
+        }
+
+        .no-records {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 11px;
+            padding: 12px;
+        }
+
+        .exit-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .exit-modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(180deg, #0d1b2a 0%, #1b263b 100%);
+            border-radius: 15px;
+            padding: 20px;
+            max-width: 320px;
+            width: 100%;
+            border: 2px solid rgba(220, 38, 38, 0.4);
+        }
+
+        .modal-title {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .modal-balance {
+            background: rgba(34, 197, 94, 0.15);
+            border: 2px solid #22c55e;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .balance-label {
+            color: #94a3b8;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .balance-value {
+            color: #22c55e;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-btn-cancel {
+            background: rgba(148, 163, 184, 0.3);
+            color: white;
+        }
+
+        .modal-btn-confirm {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: white;
+        }
+
+        .modal-btn:active {
+            transform: scale(0.98);
+        }
+
+        @media (max-width: 380px) {
+            .game-title {
+                font-size: 15px;
+            }
+            
+            .road-tile {
+                font-size: 16px;
+                min-height: 36px;
+            }
+
+            .multiplier-value {
+                font-size: 26px;
+            }
+
+            .difficulty-name {
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="top-bar">
+            <div class="header-left">
+                <button class="back-button" id="backBtn">←</button>
+                <div class="game-title">🪤 CHICKEN TRAP</div>
+            </div>
+            <div class="cash-display">
+                <span class="cash-icon">💰</span>
+                <span class="cash-amount" id="balance">100.00</span>
+            </div>
+        </div>
+
+        <div class="game-stats">
+            <div class="stat-item">
+                <span class="stat-dot"></span>
+                <span>Wins: <strong id="liveWins">11,234</strong></span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-dot" style="background: #3b82f6;"></span>
+                <span>Online: <strong id="onlineCount">8,542</strong></span>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <div class="message-display">
+                <div class="message-text" id="message">Place your bet to start!</div>
+            </div>
+
+            <div class="multiplier-display" id="multiplierDisplay" style="display: none;">
+                <div class="multiplier-value" id="multiplier">1.00x</div>
+                <div class="win-info">
+                    <div class="win-item">
+                        <div class="win-label">Current</div>
+                        <div class="win-amount" id="potentialWin">0.00</div>
+                    </div>
+                    <div class="win-item" id="nextWinDisplay" style="display: none;">
+                        <div class="win-label">Next Win</div>
+                        <div class="next-amount" id="nextWin">0.00</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="road-container">
+                <div class="road-grid" id="roadGrid"></div>
+            </div>
+
+            <div class="control-panel">
+                <div class="section-label">Bet Amount (Min: 10 • Max: 1000)</div>
+                <div class="bet-controls">
+                    <button class="min-max-btn" id="minBtn">MIN</button>
+                    <div class="bet-input-container">
+                        <input type="number" class="bet-input" id="betInput" value="10" min="10" max="1000" step="10">
+                    </div>
+                    <button class="min-max-btn" id="maxBtn">MAX</button>
+                </div>
+                <div class="quick-bet-buttons">
+                    <button class="quick-bet-btn" data-amount="20">20</button>
+                    <button class="quick-bet-btn" data-amount="50">50</button>
+                    <button class="quick-bet-btn" data-amount="100">100</button>
+                    <button class="quick-bet-btn" data-amount="500">500</button>
+                </div>
+
+                <div class="section-label">Difficulty Level</div>
+                <div class="difficulty-grid">
+                    <button class="difficulty-btn active" data-difficulty="Easy">
+                        <div class="difficulty-name">Easy</div>
+                        <div class="difficulty-info">3 Safe • 2 Traps</div>
+                        <div class="difficulty-multiplier">+18%</div>
+                    </button>
+                    <button class="difficulty-btn" data-difficulty="Normal">
+                        <div class="difficulty-name">Normal</div>
+                        <div class="difficulty-info">2 Safe • 3 Traps</div>
+                        <div class="difficulty-multiplier">+30%</div>
+                    </button>
+                    <button class="difficulty-btn" data-difficulty="Medium">
+                        <div class="difficulty-name">Medium</div>
+                        <div class="difficulty-info">2 Safe • 3 Traps</div>
+                        <div class="difficulty-multiplier">+45%</div>
+                    </button>
+                    <button class="difficulty-btn" data-difficulty="Hard">
+                        <div class="difficulty-name">Hard</div>
+                        <div class="difficulty-info">1 Safe • 4 Traps</div>
+                        <div class="difficulty-multiplier">+70%</div>
+                    </button>
+                    <button class="difficulty-btn" data-difficulty="Expert">
+                        <div class="difficulty-name">Expert</div>
+                        <div class="difficulty-info">1 Safe • 4 Traps</div>
+                        <div class="difficulty-multiplier">+90%</div>
+                    </button>
+                    <button class="difficulty-btn" data-difficulty="Master">
+                        <div class="difficulty-name">Master</div>
+                        <div class="difficulty-info">1 Safe • 4 Traps</div>
+                        <div class="difficulty-multiplier">+150%</div>
+                    </button>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="play-button" id="playBtn">
+                        <span>🎮</span>
+                        <span>PLAY</span>
+                    </button>
+                    <button class="cashout-button" id="cashoutBtn" style="display: none;">
+                        <span>💰</span>
+                        <span id="cashoutBtnText">CASH OUT</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="game-records">
+                <div class="records-header">
+                    <span class="records-title">📊 Recent Games</span>
+                    <button class="clear-records" id="clearRecordsBtn">Clear</button>
+                </div>
+                <div class="records-list" id="recordsList">
+                    <div class="no-records">No games yet. Start playing!</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="exit-modal" id="exitModal">
+        <div class="modal-content">
+            <div class="modal-title">Return to Home?</div>
+            <div class="modal-balance">
+                <div class="balance-label">Your Balance</div>
+                <div class="balance-value" id="modalBalance">100.00</div>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-cancel" id="cancelExitBtn">Cancel</button>
+                <button class="modal-btn modal-btn-confirm" id="confirmExitBtn">Go Home</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ROWS = 8;
+        const COLS = 5;
+        const MIN_BET = 10;
+        const MAX_BET = 1000;
+
+        const difficultySettings = {
+            Easy: { safeTilesPerRow: 3, multiplierIncrease: 0.18 },
+            Normal: { safeTilesPerRow: 2, multiplierIncrease: 0.30 },
+            Medium: { safeTilesPerRow: 2, multiplierIncrease: 0.45 },
+            Hard: { safeTilesPerRow: 1, multiplierIncrease: 0.70 },
+            Expert: { safeTilesPerRow: 1, multiplierIncrease: 0.90 },
+            Master: { safeTilesPerRow: 1, multiplierIncrease: 1.50 }
+        };
+
+        let gameState = {
+            balance: 100.00,
+            betAmount: 10.00,
+            difficulty: 'Easy',
+            gameActive: false,
+            gameOver: false,
+            multiplier: 1.00,
+            currentWin: 0,
+            liveWins: 11234,
+            onlineCount: 8542,
+            chickenPosition: { row: -1, col: 2 },
+            revealedTiles: [],
+            roadPattern: [],
+            canCashout: false,
+            gameRecords: []
+        };
+
+        function init() {
+            loadBalance();
+            loadGameRecords();
+            createRoadGrid();
+            updateUI();
+            startStatsAnimation();
+            setupEventListeners();
+        }
+
+        function setupEventListeners() {
+            document.getElementById('playBtn').addEventListener('click', startGame);
+            document.getElementById('cashoutBtn').addEventListener('click', () => cashout(false));
+            document.getElementById('minBtn').addEventListener('click', () => setBet('min'));
+            document.getElementById('maxBtn').addEventListener('click', () => setBet('max'));
+            document.getElementById('backBtn').addEventListener('click', showExitModal);
+            document.getElementById('cancelExitBtn').addEventListener('click', hideExitModal);
+            document.getElementById('confirmExitBtn').addEventListener('click', exitToHome);
+            document.getElementById('clearRecordsBtn').addEventListener('click', clearRecords);
+            
+            const betInput = document.getElementById('betInput');
+            betInput.addEventListener('input', function() {
+                let value = parseFloat(this.value) || MIN_BET;
+                if (value < MIN_BET) value = MIN_BET;
+                if (value > MAX_BET) value = MAX_BET;
+                if (value > gameState.balance) value = gameState.balance;
+                gameState.betAmount = value;
+            });
+
+            betInput.addEventListener('blur', function() {
+                let value = parseFloat(this.value) || MIN_BET;
+                if (value < MIN_BET) value = MIN_BET;
+                if (value > MAX_BET) value = MAX_BET;
+                if (value > gameState.balance) value = gameState.balance;
+                this.value = value.toFixed(2);
+                gameState.betAmount = value;
+            });
+            
+            document.querySelectorAll('.quick-bet-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const amount = parseInt(this.getAttribute('data-amount'));
+                    setQuickBet(amount);
+                });
+            });
+
+            document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if (gameState.gameActive) return;
+                    
+                    document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    gameState.difficulty = this.getAttribute('data-difficulty');
+                });
+            });
+        }
+
+        function createRoadGrid() {
+            const grid = document.getElementById('roadGrid');
+            grid.innerHTML = '';
+            
+            for (let row = 0; row < ROWS; row++) {
+                for (let col = 0; col < COLS; col++) {
+                    const tile = document.createElement('div');
+                    tile.className = 'road-tile';
+                    tile.setAttribute('data-row', row);
+                    tile.setAttribute('data-col', col);
+                    tile.addEventListener('click', function() {
+                        handleTileClick(row, col);
+                    });
+                    grid.appendChild(tile);
+                }
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('balance').textContent = gameState.balance.toFixed(2);
+            document.getElementById('betInput').value = gameState.betAmount.toFixed(2);
+            document.getElementById('liveWins').textContent = gameState.liveWins.toLocaleString();
+            document.getElementById('onlineCount').textContent = gameState.onlineCount.toLocaleString();
+            
+            if (gameState.gameActive) {
+                document.getElementById('multiplier').textContent = gameState.multiplier.toFixed(2) + 'x';
+                document.getElementById('potentialWin').textContent = gameState.currentWin.toFixed(2);
+                document.getElementById('cashoutBtnText').textContent = gameState.currentWin.toFixed(2);
+                
+                const nextRow = gameState.chickenPosition.row + 1;
+                if (nextRow < ROWS) {
+                    const increase = difficultySettings[gameState.difficulty].multiplierIncrease;
+                    const nextMultiplier = gameState.multiplier + increase;
+                    const nextWinAmount = gameState.betAmount * nextMultiplier;
+                    document.getElementById('nextWin').textContent = nextWinAmount.toFixed(2);
+                    document.getElementById('nextWinDisplay').style.display = 'block';
+                } else {
+                    document.getElementById('nextWinDisplay').style.display = 'none';
+                }
+            }
+        }
+
+        function startStatsAnimation() {
+            setInterval(() => {
+                gameState.liveWins += Math.floor(Math.random() * 3);
+                gameState.onlineCount += Math.floor(Math.random() * 10 - 5);
+                if (gameState.onlineCount < 7000) gameState.onlineCount = 7000;
+                if (gameState.onlineCount > 15000) gameState.onlineCount = 15000;
+                document.getElementById('liveWins').textContent = gameState.liveWins.toLocaleString();
+                document.getElementById('onlineCount').textContent = gameState.onlineCount.toLocaleString();
+            }, 3000);
+        }
+
+        function setBet(type) {
+            if (gameState.gameActive) return;
+            
+            const betInput = document.getElementById('betInput');
+            if (type === 'min') {
+                gameState.betAmount = MIN_BET;
+                betInput.value = MIN_BET.toFixed(2);
+            } else if (type === 'max') {
+                gameState.betAmount = Math.min(gameState.balance, MAX_BET);
+                betInput.value = gameState.betAmount.toFixed(2);
+            }
+            updateUI();
+        }
+
+        function setQuickBet(amount) {
+            if (gameState.gameActive) return;
+            const finalAmount = Math.min(amount, gameState.balance, MAX_BET);
+            gameState.betAmount = finalAmount;
+            document.getElementById('betInput').value = finalAmount.toFixed(2);
+            updateUI();
+        }
+
+        function generateRoadPattern() {
+            const pattern = [];
+            const safeTiles = difficultySettings[gameState.difficulty].safeTilesPerRow;
+            
+            for (let row = 0; row < ROWS; row++) {
+                const rowPattern = Array(COLS).fill('danger');
+                const safePositions = [];
+                
+                while (safePositions.length < safeTiles) {
+                    const pos = Math.floor(Math.random() * COLS);
+                    if (!safePositions.includes(pos)) {
+                        safePositions.push(pos);
+                        rowPattern[pos] = 'safe';
+                    }
+                }
+                pattern.push(rowPattern);
+            }
+            return pattern;
+        }
+
+        function startGame() {
+            if (gameState.betAmount < MIN_BET) {
+                showMessage(`❌ Minimum bet is ${MIN_BET} INR`, 'error');
+                return;
+            }
+
+            if (gameState.betAmount > MAX_BET) {
+                showMessage(`❌ Maximum bet is ${MAX_BET} INR`, 'error');
+                return;
+            }
+
+            if (gameState.betAmount > gameState.balance) {
+                showMessage('❌ Insufficient balance!', 'error');
+                return;
+            }
+
+            if (gameState.gameActive) return;
+
+            gameState.balance -= gameState.betAmount;
+            saveBalance();
+            gameState.gameActive = true;
+            gameState.gameOver = false;
+            gameState.multiplier = 1.00;
+            gameState.currentWin = gameState.betAmount;
+            gameState.chickenPosition = { row: -1, col: 2 };
+            gameState.revealedTiles = [];
+            gameState.canCashout = false;
+            gameState.roadPattern = generateRoadPattern();
+
+            updateUI();
+            renderRoad();
+            showMessage('🎯 Avoid the traps!', 'info');
+            
+            document.getElementById('playBtn').style.display = 'none';
+            document.getElementById('cashoutBtn').style.display = 'block';
+            document.getElementById('betInput').disabled = true;
+            document.querySelectorAll('.difficulty-btn').forEach(btn => btn.style.pointerEvents = 'none');
+            document.getElementById('multiplierDisplay').style.display = 'block';
+        }
+
+        function handleTileClick(row, col) {
+            if (!gameState.gameActive || gameState.gameOver) return;
+            
+            const expectedRow = gameState.chickenPosition.row + 1;
+            if (row !== expectedRow) return;
+            
+            const revealed = gameState.revealedTiles.find(t => t.row === row && t.col === col);
+            if (revealed) return;
+
+            const tileType = gameState.roadPattern[row][col];
+            gameState.revealedTiles.push({ row, col, type: tileType });
+
+            if (tileType === 'safe') {
+                gameState.chickenPosition = { row, col };
+                const increase = difficultySettings[gameState.difficulty].multiplierIncrease;
+                gameState.multiplier += increase;
+                gameState.currentWin = gameState.betAmount * gameState.multiplier;
+                gameState.canCashout = true;
+
+                renderRoad();
+                updateUI();
+                
+                if (row === ROWS - 1) {
+                    showMessage(`🏆 Max Win!`, 'success');
+                    setTimeout(() => cashout(true), 800);
+                } else {
+                    showMessage(`✅ Safe! ${gameState.multiplier.toFixed(2)}x`, 'success');
+                }
+            } else {
+                gameState.gameOver = true;
+                gameState.gameActive = false;
+                gameState.canCashout = false;
+
+                renderRoad();
+                showMessage('💀 Trapped!', 'error');
+                
+                addGameRecord('loss', gameState.betAmount, 0, gameState.multiplier, row);
+                
+                setTimeout(() => {
+                    document.getElementById('playBtn').style.display = 'block';
+                    document.getElementById('cashoutBtn').style.display = 'none';
+                    document.getElementById('betInput').disabled = false;
+                    document.querySelectorAll('.difficulty-btn').forEach(btn => btn.style.pointerEvents = 'auto');
+                    document.getElementById('multiplierDisplay').style.display = 'none';
+                }, 1500);
+            }
+        }
+
+        function cashout(autoWin) {
+            if (!gameState.canCashout && !autoWin) {
+                showMessage('⚠️ Complete a row first!', 'error');
+                return;
+            }
+
+            const winAmount = gameState.currentWin;
+            gameState.balance += winAmount;
+            saveBalance();
+            gameState.gameActive = false;
+            gameState.gameOver = true;
+            gameState.canCashout = false;
+            gameState.liveWins++;
+
+            const profit = winAmount - gameState.betAmount;
+            addGameRecord('win', gameState.betAmount, winAmount, gameState.multiplier, gameState.chickenPosition.row);
+
+            updateUI();
+            showMessage(`${autoWin ? '🏆' : '💰'} Won ${winAmount.toFixed(2)} INR`, 'success');
+
+            setTimeout(() => {
+                document.getElementById('playBtn').style.display = 'block';
+                document.getElementById('cashoutBtn').style.display = 'none';
+                document.getElementById('betInput').disabled = false;
+                document.querySelectorAll('.difficulty-btn').forEach(btn => btn.style.pointerEvents = 'auto');
+                document.getElementById('multiplierDisplay').style.display = 'none';
+            }, 2000);
+        }
+
+        function renderRoad() {
+            const tiles = document.querySelectorAll('.road-tile');
+            
+            tiles.forEach(tile => {
+                const row = parseInt(tile.getAttribute('data-row'));
+                const col = parseInt(tile.getAttribute('data-col'));
+                
+                tile.className = 'road-tile';
+                tile.textContent = '';
+
+                if (gameState.chickenPosition.row === row && gameState.chickenPosition.col === col) {
+                    tile.classList.add('chicken');
+                    tile.textContent = '🐔';
+                    return;
+                }
+
+                const revealed = gameState.revealedTiles.find(t => t.row === row && t.col === col);
+                if (revealed) {
+                    tile.classList.add(revealed.type);
+                    tile.textContent = revealed.type === 'safe' ? '✅' : '🪤';
+                    return;
+                }
+
+                if (gameState.gameActive && !gameState.gameOver && row === gameState.chickenPosition.row + 1) {
+                    tile.classList.add('clickable');
+                }
+            });
+        }
+
+        function showMessage(text, type) {
+            const msgEl = document.getElementById('message');
+            msgEl.textContent = text;
+            msgEl.className = 'message-text';
+            if (type === 'success') msgEl.classList.add('success');
+            if (type === 'info') msgEl.classList.add('info');
+        }
+
+        function addGameRecord(result, bet, win, multiplier, row) {
+            const record = {
+                result: result,
+                bet: bet,
+                win: win,
+                multiplier: multiplier,
+                row: row,
+                difficulty: gameState.difficulty,
+                timestamp: new Date().toLocaleTimeString()
+            };
+            
+            gameState.gameRecords.unshift(record);
+            if (gameState.gameRecords.length > 12) {
+                gameState.gameRecords.pop();
+            }
+            
+            saveGameRecords();
+            renderGameRecords();
+        }
+
+        function renderGameRecords() {
+            const recordsList = document.getElementById('recordsList');
+            
+            if (gameState.gameRecords.length === 0) {
+                recordsList.innerHTML = '<div class="no-records">No games yet. Start playing!</div>';
+                return;
+            }
+            
+            recordsList.innerHTML = '';
+            gameState.gameRecords.forEach(record => {
+                const recordItem = document.createElement('div');
+                recordItem.className = 'record-item';
+                
+                const isWin = record.result === 'win';
+                const amount = isWin ? record.win : record.bet;
+                const sign = isWin ? '+' : '-';
+                
+                recordItem.innerHTML = `
+                    <div class="record-info">
+                        <div class="record-result ${record.result}">
+                            ${isWin ? '✅ WIN' : '💀 LOSS'}
+                        </div>
+                        <div class="record-details">
+                            ${record.difficulty} • ${record.multiplier.toFixed(2)}x • ${record.timestamp}
+                        </div>
+                    </div>
+                    <div class="record-amount ${record.result}">
+                        ${sign}${amount.toFixed(2)}
+                    </div>
+                `;
+                
+                recordsList.appendChild(recordItem);
+            });
+        }
+
+        function clearRecords() {
+            if (confirm('Clear all game records?')) {
+                gameState.gameRecords = [];
+                saveGameRecords();
+                renderGameRecords();
+            }
+        }
+
+        function saveGameRecords() {
+            try {
+                localStorage.setItem('chickenTrapRecords', JSON.stringify(gameState.gameRecords));
+            } catch (e) {}
+        }
+
+        function loadGameRecords() {
+            try {
+                const saved = localStorage.getItem('chickenTrapRecords');
+                if (saved) {
+                    gameState.gameRecords = JSON.parse(saved);
+                    renderGameRecords();
+                }
+            } catch (e) {}
+        }
+
+        function saveBalance() {
+            try {
+                localStorage.setItem('chickenTrapBalance', gameState.balance.toString());
+            } catch (e) {}
+        }
+
+        function loadBalance() {
+            try {
+                const saved = localStorage.getItem('chickenTrapBalance');
+                if (saved) {
+                    gameState.balance = parseFloat(saved);
+                    if (isNaN(gameState.balance) || gameState.balance < 0) {
+                        gameState.balance = 100.00;
+                    }
+                }
+            } catch (e) {
+                gameState.balance = 100.00;
+            }
+        }
+
+        function showExitModal() {
+            document.getElementById('modalBalance').textContent = gameState.balance.toFixed(2);
+            document.getElementById('exitModal').classList.add('show');
+        }
+
+        function hideExitModal() {
+            document.getElementById('exitModal').classList.remove('show');
+        }
+
+        function exitToHome() {
+            saveBalance();
+            window.location.href = 'games.html';
+        }
+
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

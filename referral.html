@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Play - Agency</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(180deg, #0a1628 0%, #162447 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: linear-gradient(180deg, #0d1b2a 0%, #1b263b 100%);
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 100px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-title {
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+            text-align: center;
+            flex: 1;
+        }
+
+        .menu-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .menu-icon:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Commission Banner */
+        .commission-banner {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            padding: 30px 20px;
+            text-align: center;
+            margin: 20px 15px;
+            border-radius: 15px;
+            box-shadow: 0 6px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        .commission-amount {
+            color: white;
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .commission-label {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 15px;
+            margin-bottom: 15px;
+        }
+
+        .upgrade-text {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 13px;
+        }
+
+        /* Stats Cards */
+        .stats-container {
+            padding: 0 15px 20px;
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .stats-header {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 15px;
+        }
+
+        .stats-tab {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #6b7280;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .stats-tab:hover {
+            color: #2563eb;
+        }
+
+        .stats-tab.active {
+            color: #2563eb;
+        }
+
+        .tab-icon {
+            font-size: 24px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 5px;
+        }
+
+        .stat-value.highlight {
+            color: #10b981;
+        }
+
+        .stat-value.warning {
+            color: #f59e0b;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #6b7280;
+            line-height: 1.4;
+        }
+
+        /* Invitation Link Button */
+        .invitation-btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 16px;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            margin: 0 15px 20px;
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+            transition: all 0.3s;
+            width: calc(100% - 30px);
+        }
+
+        .invitation-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6);
+        }
+
+        /* Menu Items */
+        .menu-section {
+            padding: 0 15px 20px;
+        }
+
+        .menu-item {
+            background: white;
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .menu-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .menu-item-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .menu-item-text {
+            color: #374151;
+            font-size: 16px;
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .menu-item-value {
+            color: #6b7280;
+            font-size: 15px;
+            margin-right: 5px;
+        }
+
+        .menu-item-arrow {
+            color: #9ca3af;
+            font-size: 18px;
+        }
+
+        /* Promotion Data Card */
+        .promotion-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 0 15px 20px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .promotion-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .promotion-icon {
+            width: 45px;
+            height: 45px;
+            background: #1f2937;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .promotion-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1f2937;
+        }
+
+        .promotion-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .promotion-item {
+            text-align: center;
+        }
+
+        .promotion-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .promotion-label {
+            font-size: 13px;
+            color: #6b7280;
+            line-height: 1.4;
+        }
+
+        /* Remove underline from links */
+        a {
+            text-decoration: none;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 480px;
+            width: 100%;
+            background: linear-gradient(180deg, #0a1628 0%, #000000 100%);
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            border-top: 2px solid rgba(255, 165, 0, 0.3);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 5px 15px;
+        }
+
+        .nav-item.active {
+            color: #ffa500;
+        }
+
+        .nav-item:hover {
+            color: #ffa500;
+            transform: translateY(-2px);
+        }
+
+        .nav-icon {
+            font-size: 24px;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(59, 130, 246, 0.5);
+            z-index: 2000;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from { 
+                transform: translateX(-50%) translateY(-100px); 
+                opacity: 0; 
+            }
+            to { 
+                transform: translateX(-50%) translateY(0); 
+                opacity: 1; 
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+      <!-- Header -->
+<div class="header">
+    <div style="width: 40px;"></div>
+
+    <div class="header-title">Agency</div>
+
+    <a href="wallet.html" class="menu-icon" style="text-decoration: none;">
+        <span style="font-size: 24px;">💳</span>
+    </a>
+</div>
+
+        <!-- Commission Banner -->
+        <div class="commission-banner">
+            <div class="commission-amount" id="totalCommission">0</div>
+            <div class="commission-label">Yesterday's total commission</div>
+            <div class="upgrade-text">Upgrade the level to increase commission income</div>
+        </div>
+
+        <!-- Stats Card -->
+        <div class="stats-container">
+            <div class="stats-card">
+                <div class="stats-header">
+                    <div class="stats-tab active" data-tab="direct">
+                        <span class="tab-icon">👤</span>
+                        <span>Direct subordinates</span>
+                    </div>
+                    <div class="stats-tab" data-tab="team">
+                        <span class="tab-icon">👥</span>
+                        <span>Team subordinates</span>
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="registerCount">0</div>
+                        <div class="stat-label">Number of register</div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="stat-value" id="teamRegisterCount">0</div>
+                        <div class="stat-label">Number of register</div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="stat-value highlight" id="depositNumber">0</div>
+                        <div class="stat-label">Deposit number</div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="stat-value highlight" id="teamDepositNumber">0</div>
+                        <div class="stat-label">Deposit number</div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="stat-value warning" id="depositAmount">0</div>
+                        <div class="stat-label">Deposit amount</div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="stat-value warning" id="teamDepositAmount">0</div>
+                        <div class="stat-label">Deposit amount</div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="stat-value" id="firstDeposit">0</div>
+                        <div class="stat-label">Number of people making first deposit</div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="stat-value" id="teamFirstDeposit">0</div>
+                        <div class="stat-label">Number of people making first deposit</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invitation Link Button -->
+        <button class="invitation-btn" onclick="showInvitationLink()">INVITATION LINK</button>
+
+        <!-- Menu Items -->
+        <div class="menu-section">
+            <!-- Copy Invitation Code -->
+            <div class="menu-item" onclick="copyInvitationCode()">
+                <div class="menu-item-icon">📧</div>
+                <div class="menu-item-text">Copy invitation code</div>
+                <div class="menu-item-value" id="invitationCode">3070092329</div>
+                <div class="menu-item-arrow">›</div>
+            </div>
+
+            <!-- Subordinate Data -->
+            <div class="menu-item" onclick="goToSubordinateData()">
+                <div class="menu-item-icon">📅</div>
+                <div class="menu-item-text">Subordinate data</div>
+                <div class="menu-item-arrow">›</div>
+            </div>
+
+            <!-- Commission Detail -->
+            <div class="menu-item" onclick="goToCommissionDetail()">
+                <div class="menu-item-icon">₹</div>
+                <div class="menu-item-text">Commission detail</div>
+                <div class="menu-item-arrow">›</div>
+            </div>
+
+            <!-- Invitation Rules -->
+            <div class="menu-item" onclick="goToInvitationRules()">
+                <div class="menu-item-icon">📋</div>
+                <div class="menu-item-text">Invitation rules</div>
+                <div class="menu-item-arrow">›</div>
+            </div>
+
+            <!-- Agent Line Customer Service -->
+             <a href="chatbot.html" class="menu-item">
+                <div class="menu-item-icon">💬</div>
+                <div class="menu-item-text">Agent line customer service</div>
+                <div class="menu-item-arrow">›</div>
+            </a>
+
+            <!-- Rebate Ratio -->
+            <div class="menu-item" onclick="goToRebateRatio()">
+                <div class="menu-item-icon">💰</div>
+                <div class="menu-item-text">Rebate ratio</div>
+                <div class="menu-item-arrow">›</div>
+            </div>
+        </div>
+
+        <!-- Promotion Data Card -->
+        <div class="promotion-card">
+            <div class="promotion-header">
+                <div class="promotion-icon">📊</div>
+                <div class="promotion-title">Promotion data</div>
+            </div>
+            
+            <div class="promotion-grid">
+                <div class="promotion-item">
+                    <div class="promotion-value" id="thisWeek">0</div>
+                    <div class="promotion-label">This Week</div>
+                </div>
+                
+                <div class="promotion-item">
+                    <div class="promotion-value" id="totalCommissionPromo">0</div>
+                    <div class="promotion-label">Total commission</div>
+                </div>
+                
+                <div class="promotion-item">
+                    <div class="promotion-value" id="directSubordinate">0</div>
+                    <div class="promotion-label">Direct subordinate</div>
+                </div>
+                
+                <div class="promotion-item">
+                    <div class="promotion-value" id="totalSubordinates">0</div>
+                    <div class="promotion-label">Total number of subordinates in the team</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="games.html" class="nav-item">
+                <div class="nav-icon">🎮</div>
+                <div class="nav-label">Games</div>
+            </a>
+
+            <a href="promotion.html" class="nav-item">
+                <div class="nav-icon">📢</div>
+                <div class="nav-label">Promotion</div>
+            </a>
+
+            <a href="wallet.html" class="nav-item">
+                <div class="nav-icon">💰</div>
+                <div class="nav-label">Wallet</div>
+            </a>
+
+            <a href="user.html" class="nav-item">
+                <div class="nav-icon">👤</div>
+                <div class="nav-label">Account</div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Sample data - Replace with your backend API calls
+        const referralData = {
+            totalCommission: 0,
+            direct: {
+                registerCount: 0,
+                depositNumber: 0,
+                depositAmount: 0,
+                firstDeposit: 0
+            },
+            team: {
+                registerCount: 0,
+                depositNumber: 0,
+                depositAmount: 0,
+                firstDeposit: 0
+            },
+            invitationCode: '3070092329',
+            promotion: {
+                thisWeek: 0,
+                totalCommission: 0,
+                directSubordinate: 0,
+                totalSubordinates: 0
+            }
+        };
+
+        // Load data on page load
+        window.addEventListener('load', function() {
+            loadReferralData();
+        });
+
+        // Function to load referral data (replace with actual API call)
+        function loadReferralData() {
+            // TODO: Replace with actual API call
+            // Example: fetch('/api/referral-data').then(response => response.json()).then(data => { ... })
+            
+            // For now, using sample data
+            updateUI(referralData);
+        }
+
+        // Update UI with data
+        function updateUI(data) {
+            document.getElementById('totalCommission').textContent = data.totalCommission;
+            document.getElementById('registerCount').textContent = data.direct.registerCount;
+            document.getElementById('depositNumber').textContent = data.direct.depositNumber;
+            document.getElementById('depositAmount').textContent = data.direct.depositAmount;
+            document.getElementById('firstDeposit').textContent = data.direct.firstDeposit;
+            
+            document.getElementById('teamRegisterCount').textContent = data.team.registerCount;
+            document.getElementById('teamDepositNumber').textContent = data.team.depositNumber;
+            document.getElementById('teamDepositAmount').textContent = data.team.depositAmount;
+            document.getElementById('teamFirstDeposit').textContent = data.team.firstDeposit;
+            
+            document.getElementById('invitationCode').textContent = data.invitationCode;
+            
+            document.getElementById('thisWeek').textContent = data.promotion.thisWeek;
+            document.getElementById('totalCommissionPromo').textContent = data.promotion.totalCommission;
+            document.getElementById('directSubordinate').textContent = data.promotion.directSubordinate;
+            document.getElementById('totalSubordinates').textContent = data.promotion.totalSubordinates;
+        }
+
+        // Show toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Copy invitation code
+        function copyInvitationCode() {
+            const code = document.getElementById('invitationCode').textContent;
+            
+            // Create temporary input to copy text
+            const tempInput = document.createElement('input');
+            tempInput.value = code;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            
+            showToast('✅ Invitation code copied: ' + code);
+        }
+
+        // Show invitation link
+        function showInvitationLink() {
+            const code = referralData.invitationCode;
+            const link = `https://quickplay.com/register?ref=${code}`;
+            
+            // Copy to clipboard
+            const tempInput = document.createElement('input');
+            tempInput.value = link;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            
+            showToast('🔗 Invitation link copied!');
+        }
+
+        // Navigation functions
+        function goToSubordinateData() {
+            showToast('📅 Opening Subordinate Data...');
+            // window.location.href = 'subordinate-data.html';
+        }
+
+        function goToCommissionDetail() {
+            showToast('₹ Opening Commission Details...');
+            // window.location.href = 'commission-detail.html';
+        }
+
+        function goToInvitationRules() {
+            showToast('📋 Opening Invitation Rules...');
+            // window.location.href = 'invitation-rules.html';
+        }
+
+        function goToCustomerService() {
+            showToast('💬 Opening Customer Service...');
+            // window.location.href = 'customer-service.html';
+        }
+
+        function goToRebateRatio() {
+            showToast('💰 Opening Rebate Ratio...');
+            // window.location.href = 'rebate-ratio.html';
+        }
+
+        // Tab switching
+        document.querySelectorAll('.stats-tab').forEach((tab) => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.stats-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                const tabType = this.getAttribute('data-tab');
+                if (tabType === 'direct') {
+                    showToast('👤 Showing Direct Subordinates');
+                } else {
+                    showToast('👥 Showing Team Subordinates');
+                }
+            });
+        });
+
+        // Bottom navigation active state
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

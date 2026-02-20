@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Play - Games</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(180deg, #0a1628 0%, #162447 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: linear-gradient(180deg, #0d1b2a 0%, #1b263b 100%);
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 80px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(180deg, #0a1628 0%, #162447 100%);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-img {
+            height: 45px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .logo-text {
+            color: white;
+            font-weight: bold;
+            font-size: 22px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .cash-display {
+            background: rgba(255, 165, 0, 0.15);
+            border: 2px solid #ffa500;
+            border-radius: 25px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cash-icon {
+            font-size: 18px;
+        }
+
+        .cash-amount {
+            color: #ffa500;
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .add-cash-btn {
+            background: rgba(255, 165, 0, 0.15);
+            border: 2px solid #ffa500;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #ffa500;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .add-cash-btn:hover {
+            background: rgba(255, 165, 0, 0.25);
+            transform: scale(1.05);
+        }
+
+        .notification-btn {
+            position: relative;
+            background: rgba(255, 165, 0, 0.15);
+            border: 2px solid #ffa500;
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .notification-btn:hover {
+            background: rgba(255, 165, 0, 0.25);
+            transform: scale(1.05);
+        }
+
+        .notification-icon {
+            font-size: 22px;
+            color: #ffa500;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: #dc2626;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            border: 2px solid #0a1628;
+        }
+
+        /* Banner Carousel */
+        .banner-carousel {
+            position: relative;
+            margin: 20px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .promotional-banner {
+            width: 100%;
+            position: relative;
+        }
+
+        .promo-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 15px;
+        }
+
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 15px;
+            padding-bottom: 10px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .dot.active {
+            background: white;
+            width: 30px;
+            border-radius: 5px;
+        }
+
+        /* Games Grid */
+        .games-section {
+            padding: 0 20px 20px;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .game-card {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .game-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 165, 0, 0.4);
+            border-color: rgba(255, 165, 0, 0.5);
+        }
+
+        .game-card:active {
+            transform: scale(0.95);
+        }
+
+        .game-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Coming Soon Badge */
+        .coming-soon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.85);
+            color: #ffd700;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            text-align: center;
+            z-index: 10;
+            border: 2px solid #ffd700;
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .game-card.coming::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 480px;
+            width: 100%;
+            background: linear-gradient(180deg, #0a1628 0%, #000000 100%);
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            border-top: 2px solid rgba(255, 165, 0, 0.3);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 5px 15px;
+            text-decoration: none;
+        }
+
+        .nav-item.active {
+            color: #ffa500;
+        }
+
+        .nav-item:hover {
+            color: #ffa500;
+            transform: translateY(-2px);
+        }
+
+        .nav-icon {
+            font-size: 24px;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Placeholder for missing images */
+        .placeholder {
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 50%, #16a34a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .placeholder-racing {
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 50%, #16a34a 100%);
+        }
+
+        .placeholder-rocket {
+            background: linear-gradient(135deg, #fb923c 0%, #dc2626 50%, #450a0a 100%);
+        }
+
+        .placeholder-fruit {
+            background: linear-gradient(135deg, #fbbf24 0%, #f97316 50%, #dc2626 100%);
+        }
+
+        .placeholder-coin {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 50%, #000000 100%);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(180deg, #0d1b2a 0%, #1b263b 100%);
+            padding: 25px 20px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 380px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 165, 0, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .modal-title {
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            font-size: 26px;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: white;
+        }
+
+        .modal-body {
+            color: #e2e8f0;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            display: block;
+            color: #e2e8f0;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 13px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid rgba(148, 163, 184, 0.2);
+            border-radius: 10px;
+            color: white;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #ffa500;
+            background: rgba(30, 41, 59, 0.8);
+        }
+
+        .amount-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        .amount-btn {
+            padding: 10px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid rgba(148, 163, 184, 0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .amount-btn:hover, .amount-btn.active {
+            background: rgba(255, 165, 0, 0.2);
+            border-color: #ffa500;
+            color: #ffa500;
+        }
+
+        .submit-button {
+            width: 100%;
+            background: linear-gradient(135deg, #ffa500 0%, #ff8c00 100%);
+            border: none;
+            color: white;
+            padding: 14px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 165, 0, 0.4);
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 165, 0, 0.6);
+        }
+
+        .info-text {
+            color: #94a3b8;
+            font-size: 12px;
+            text-align: center;
+            margin-top: 12px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header with Logo, Cash Balance, Add Cash, and Notification -->
+        <div class="header">
+            <div class="logo-container">
+                <img src="quickplay logo.jpeg" alt="Quick Play" class="logo-img"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div class="logo-text" style="display:none;">Quick PLAY</div>
+            </div>
+            
+            <div class="header-right">
+                <div class="cash-display">
+                    <span class="cash-icon">👍</span>
+                    <span class="cash-amount">00.00</span>
+                </div>
+                
+                <div class="add-cash-btn" onclick="openAddCashModal()">+</div>
+                
+                <div class="notification-btn" onclick="openNotifications()">
+                    <span class="notification-icon">🔔</span>
+                    <span class="notification-badge">3</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Promotional Banner -->
+        <div class="banner-carousel">
+            <div class="promotional-banner">
+                <img src="new game launched.png" alt="New Game Launched" class="promo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="placeholder" style="display:none; min-height:250px; background: radial-gradient(ellipse at center, #1e40af 0%, #0f172a 100%);">
+                    📢 New Game Launched! 🎮<br>Add your banner image URL
+                </div>
+            </div>
+            
+            <div class="carousel-dots">
+                <span class="dot active"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+        </div>
+
+        <!-- Games Grid -->
+        <div class="games-section">
+            <div class="games-grid">
+                <!-- Game 1 - Racing -->
+                <div class="game-card" onclick="playGame(1)">
+                    <img src="chicken road image.png" alt="Racing Game" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="placeholder placeholder-racing" style="display:none;">🐔<br>Chicken Trap</div>
+                </div>
+
+                <!-- Game 2 - Rocket -->
+                <div class="game-card" onclick="playGame(2)">
+                    <img src="aviator.png" alt="Rocket Game" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="placeholder placeholder-rocket" style="display:none;">🚀<br>Aviator</div>
+                </div>
+
+                <!-- Game 3 - Fruit -->
+                <div class="game-card" onclick="playGame(3)">
+                    <img src="fruit-game.jpg" alt="Fruit Game" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="placeholder placeholder-fruit" style="display:none;">🍊<br>Fruit Game</div>
+                </div>
+
+                <!-- Game 4 - Coin -->
+                <div class="game-card" onclick="playGame(4)">
+                    <img src="coin-game.jpg" alt="Coin Game" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="placeholder placeholder-coin" style="display:none;">🪙<br>Coin Game</div>
+                </div>
+
+                <!-- Game 5 - Rocket 2 -->
+                <div class="game-card" onclick="playGame(5)">
+                    <img src="rocket-game.jpg" alt="Rocket Game" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="placeholder placeholder-rocket" style="display:none;">🚀<br>Rocket Game</div>
+                </div>
+
+                <!-- Game 6 - Racing 2 -->
+                <div class="game-card" onclick="playGame(6)">
+                    <img src="racing-game.jpg" alt="Racing Game" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="placeholder placeholder-racing" style="display:none;">🏎️<br>Racing Game</div>
+                </div>
+
+                <!-- Game 7 - Coming Soon -->
+                <div class="game-card coming">
+                    <img src="coin-game.jpg" alt="Coming Soon" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="placeholder placeholder-coin" style="display:none;">🪙<br>Coin Game</div>
+                    <div class="coming-soon">COMING<br>SOON</div>
+                </div>
+
+                <!-- Game 8 - Coming Soon -->
+                <div class="game-card coming">
+                    <img src="fruit-game.jpg" alt="Coming Soon" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="placeholder placeholder-fruit" style="display:none;">🍊<br>Fruit Game</div>
+                    <div class="coming-soon">COMING<br>SOON</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="games.html" class="nav-item active">
+                <div class="nav-icon">🎮</div>
+                <div class="nav-label">Games</div>
+            </a>
+
+            <a href="promotion.html" class="nav-item">
+                <div class="nav-icon">📢</div>
+                <div class="nav-label">Promotion</div>
+            </a>
+
+            <a href="wallet.html" class="nav-item">
+                <div class="nav-icon">💰</div>
+                <div class="nav-label">Wallet</div>
+            </a>
+
+            <a href="user.html" class="nav-item">
+                <div class="nav-icon">👤</div>
+                <div class="nav-label">User</div>
+            </a>
+        </div>
+    </div>
+    <!-- Add Cash Modal -->
+    <div class="modal" id="addCashModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">💰 Add Cash</div>
+                <button class="modal-close" onclick="closeAddCashModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Select Amount</label>
+                    <div class="amount-buttons">
+                        <button class="amount-btn" onclick="selectAmount(100)">₹100</button>
+                        <button class="amount-btn" onclick="selectAmount(500)">₹500</button>
+                        <button class="amount-btn" onclick="selectAmount(1000)">₹1000</button>
+                        <button class="amount-btn" onclick="selectAmount(2000)">₹2000</button>
+                        <button class="amount-btn" onclick="selectAmount(5000)">₹5000</button>
+                        <button class="amount-btn" onclick="selectAmount(10000)">₹10000</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Or Enter Custom Amount</label>
+                    <input 
+                        type="number" 
+                        class="form-input" 
+                        placeholder="Enter amount"
+                        id="customAmount"
+                        min="100"
+                        max="100000"
+                    >
+                </div>
+
+                <button class="submit-button" onclick="processCashAdd()">PROCEED TO PAY</button>
+                
+                <div class="info-text">
+                    ℹ️ Minimum deposit: ₹100 | Maximum deposit: ₹100,000<br>
+                    All transactions are 100% secure and encrypted
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedAmount = 0;
+
+        // Add Cash Modal Functions
+        function openAddCashModal() {
+            document.getElementById('addCashModal').classList.add('show');
+        }
+
+        function closeAddCashModal() {
+            document.getElementById('addCashModal').classList.remove('show');
+            document.getElementById('customAmount').value = '';
+            selectedAmount = 0;
+            document.querySelectorAll('.amount-btn').forEach(btn => btn.classList.remove('active'));
+        }
+
+        function selectAmount(amount) {
+            selectedAmount = amount;
+            document.getElementById('customAmount').value = amount;
+            document.querySelectorAll('.amount-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function processCashAdd() {
+            const amount = document.getElementById('customAmount').value || selectedAmount;
+            
+            if (!amount || amount < 100) {
+                alert('⚠️ Minimum deposit amount is ₹100');
+                return;
+            }
+
+            if (amount > 100000) {
+                alert('⚠️ Maximum deposit amount is ₹100,000');
+                return;
+            }
+
+            closeAddCashModal();
+            alert('💳 Redirecting to payment gateway...');
+            // window.location.href = 'payment.html?amount=' + amount;
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('addCashModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeAddCashModal();
+            }
+        });
+
+        // Notifications
+        function openNotifications() {
+            alert('🔔 You have 3 new notifications');
+            // window.location.href = 'notifications.html';
+        }
+
+        // Play Game Function - Now redirects to game1.html, game2.html, etc.
+        function playGame(gameNumber) {
+            window.location.href = 'game' + gameNumber + '.html';
+        }
+
+        // Navigation Functions
+        function goToPage(page) {
+            if (page === 'promotion') {
+                window.location.href = 'promotion.html';
+            } else if (page === 'wallet') {
+                window.location.href = 'wallet.html';
+            } else if (page === 'user') {
+                window.location.href = 'user.html';
+            }
+        }
+
+        // Bottom navigation active state
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Carousel auto-slide
+        const dots = document.querySelectorAll('.dot');
+        let currentDot = 0;
+
+        setInterval(() => {
+            dots[currentDot].classList.remove('active');
+            currentDot = (currentDot + 1) % dots.length;
+            dots[currentDot].classList.add('active');
+        }, 4000);
+    </script>
+</body>
+</html>

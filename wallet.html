@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Play - Wallet</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(180deg, #0a1628 0%, #162447 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: linear-gradient(180deg, #0d1b2a 0%, #1b263b 100%);
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 100px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(180deg, #0a1628 0%, #162447 100%);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-img {
+            height: 45px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .logo-text {
+            color: white;
+            font-weight: bold;
+            font-size: 22px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .bonus-display {
+            background: rgba(255, 165, 0, 0.15);
+            border: 2px solid #ffa500;
+            border-radius: 25px;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bonus-icon {
+            font-size: 20px;
+        }
+
+        .bonus-amount {
+            color: #ffa500;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .notification-btn {
+            position: relative;
+            background: rgba(255, 165, 0, 0.15);
+            border: 2px solid #ffa500;
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .notification-btn:hover {
+            background: rgba(255, 165, 0, 0.25);
+            transform: scale(1.05);
+        }
+
+        .notification-icon {
+            font-size: 22px;
+            color: #ffa500;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: #dc2626;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            border: 2px solid #0a1628;
+        }
+
+        /* Balance Cards Section */
+        .balance-section {
+            padding: 15px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .balance-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        }
+
+        .balance-icon {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 35px;
+            position: relative;
+        }
+
+        .balance-label {
+            color: #94a3b8;
+            font-size: 12px;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .balance-amount {
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .balance-button {
+            width: 100%;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+
+        .btn-add-cash {
+            background: white;
+            color: #1e3a5f;
+        }
+
+        .btn-add-cash:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.4);
+        }
+
+        .btn-withdraw {
+            background: linear-gradient(135deg, #ffa500 0%, #ff8c00 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 165, 0, 0.4);
+        }
+
+        .btn-withdraw:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 165, 0, 0.6);
+        }
+
+        /* Promotional Banner */
+        .promo-banner-section {
+            padding: 0 15px 15px;
+        }
+
+        .promo-banner {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 165, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .promo-banner:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(255, 165, 0, 0.4);
+            border-color: rgba(255, 165, 0, 0.5);
+        }
+
+        .promo-banner-img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 12px;
+        }
+
+        /* Carousel Dots */
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 12px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .dot.active {
+            background: white;
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        /* Menu Options Section */
+        .menu-section {
+            padding: 0 15px 20px;
+        }
+
+        .menu-item {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .menu-item:hover {
+            transform: translateX(5px);
+            background: linear-gradient(135deg, #2c5282 0%, #3b6fa8 100%);
+            border-color: rgba(255, 165, 0, 0.5);
+        }
+
+        .menu-item:active {
+            transform: translateX(3px);
+        }
+
+        .menu-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .menu-text {
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            flex: 1;
+        }
+
+        .menu-arrow {
+            color: #94a3b8;
+            font-size: 18px;
+        }
+
+        /* Remove underline from links */
+        a {
+            text-decoration: none;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 480px;
+            width: 100%;
+            background: linear-gradient(180deg, #0a1628 0%, #000000 100%);
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            border-top: 2px solid rgba(255, 165, 0, 0.3);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 5px 15px;
+        }
+
+        .nav-item.active {
+            color: #ffa500;
+        }
+
+        .nav-item:hover {
+            color: #ffa500;
+            transform: translateY(-2px);
+        }
+
+        .nav-icon {
+            font-size: 24px;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(180deg, #0d1b2a 0%, #1b263b 100%);
+            padding: 25px 20px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 380px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 165, 0, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .modal-title {
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            font-size: 26px;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: white;
+        }
+
+        .modal-body {
+            color: #e2e8f0;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            display: block;
+            color: #e2e8f0;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 13px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid rgba(148, 163, 184, 0.2);
+            border-radius: 10px;
+            color: white;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #ffa500;
+            background: rgba(30, 41, 59, 0.8);
+        }
+
+        .amount-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        .amount-btn {
+            padding: 10px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid rgba(148, 163, 184, 0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .amount-btn:hover, .amount-btn.active {
+            background: rgba(255, 165, 0, 0.2);
+            border-color: #ffa500;
+            color: #ffa500;
+        }
+
+        .submit-button {
+            width: 100%;
+            background: linear-gradient(135deg, #ffa500 0%, #ff8c00 100%);
+            border: none;
+            color: white;
+            padding: 14px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 165, 0, 0.4);
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 165, 0, 0.6);
+        }
+
+        .info-text {
+            color: #94a3b8;
+            font-size: 12px;
+            text-align: center;
+            margin-top: 12px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+       <!-- Header with Logo, Bonus, and Notification -->
+        <div class="header">
+            <div class="logo-container">
+                <img src="quickplay logo.jpeg" alt="Quick Play" class="logo-img"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div class="logo-text" style="display:none;">Quick PLAY</div>
+            </div>
+            
+            <div class="header-right">
+                <div class="bonus-display">
+                    <span class="bonus-icon">🪙</span>
+                    <span class="bonus-amount">000.00</span>
+                </div>
+                
+                <div class="notification-btn" onclick="openNotifications()">
+                    <span class="notification-icon">🔔</span>
+                    <span class="notification-badge">3</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Balance Cards -->
+        <div class="balance-section">
+            <!-- My Balance Card -->
+            <div class="balance-card">
+                <div class="balance-icon">💳</div>
+                <div class="balance-label">My Balance</div>
+                <div class="balance-amount">INR 0.00</div>
+                <button class="balance-button btn-add-cash" onclick="openAddCashModal()">Add Cash</button>
+            </div>
+
+            <!-- Withdrawable Balance Card -->
+            <div class="balance-card">
+                <div class="balance-icon">💰</div>
+                <div class="balance-label">Withdrawable Balance</div>
+                <div class="balance-amount">INR 0.00</div>
+                <button class="balance-button btn-withdraw" onclick="openWithdrawModal()">Withdraw</button>
+            </div>
+        </div>
+
+       <!-- Promotional Banner -->
+        <div class="promo-banner-section">
+            <div class="promo-banner" onclick="openPromotion()">
+                <img src="new game launched.png" alt="New Game Launched" class="promo-banner-img">
+            </div>
+            
+            <div class="carousel-dots">
+                <span class="dot active"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+        </div>
+
+        <!-- Menu Options -->
+        <div class="menu-section">
+            <!-- Transaction -->
+            <a href="transaction.html" class="menu-item">
+                <div class="menu-icon">🏛️</div>
+                <div class="menu-text">Transaction</div>
+                <div class="menu-arrow">›</div>
+            </a>
+
+            <!-- Bank Account -->
+            <a href="bank account.html" class="menu-item">
+                <div class="menu-icon">💳</div>
+                <div class="menu-text">Bank Account</div>
+                <div class="menu-arrow">›</div>
+            </a>
+
+            <!-- Help and Feedback -->
+            <a href="chatbot.html" class="menu-item">
+                <div class="menu-icon">💬</div>
+                <div class="menu-text">Help and Feedback</div>
+                <div class="menu-arrow">›</div>
+            </a>
+
+           <!-- Referrals -->
+            <a href="referral.html" class="menu-item">
+                <div class="menu-icon">👥</div>
+                <div class="menu-text">Referrals</div>
+                <div class="menu-arrow">›</div>
+            </a>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="games.html" class="nav-item">
+                <div class="nav-icon">🎮</div>
+                <div class="nav-label">Games</div>
+            </a>
+
+            <a href="promotion.html" class="nav-item">
+                <div class="nav-icon">📢</div>
+                <div class="nav-label">Promotion</div>
+            </a>
+
+            <a href="wallet.html" class="nav-item active">
+                <div class="nav-icon">💰</div>
+                <div class="nav-label">Wallet</div>
+            </a>
+
+            <a href="user.html" class="nav-item">
+                <div class="nav-icon">👤</div>
+                <div class="nav-label">User</div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Add Cash Modal -->
+    <div class="modal" id="addCashModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">💰 Add Cash</div>
+                <button class="modal-close" onclick="closeAddCashModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Select Amount</label>
+                    <div class="amount-buttons">
+                        <button class="amount-btn" onclick="selectAmount(100)">₹100</button>
+                        <button class="amount-btn" onclick="selectAmount(500)">₹500</button>
+                        <button class="amount-btn" onclick="selectAmount(1000)">₹1000</button>
+                        <button class="amount-btn" onclick="selectAmount(2000)">₹2000</button>
+                        <button class="amount-btn" onclick="selectAmount(5000)">₹5000</button>
+                        <button class="amount-btn" onclick="selectAmount(10000)">₹10000</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Or Enter Custom Amount</label>
+                    <input 
+                        type="number" 
+                        class="form-input" 
+                        placeholder="Enter amount"
+                        id="customAmount"
+                        min="100"
+                        max="100000"
+                    >
+                </div>
+
+                <button class="submit-button" onclick="processCashAdd()">PROCEED TO PAY</button>
+                
+                <div class="info-text">
+                    ℹ️ Minimum deposit: ₹100 | Maximum deposit: ₹100,000<br>
+                    All transactions are 100% secure and encrypted
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdraw Modal -->
+    <div class="modal" id="withdrawModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">💸 Withdraw Cash</div>
+                <button class="modal-close" onclick="closeWithdrawModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Available Balance: INR 0.00</label>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Select Amount</label>
+                    <div class="amount-buttons">
+                        <button class="amount-btn" onclick="selectWithdrawAmount(100)">₹100</button>
+                        <button class="amount-btn" onclick="selectWithdrawAmount(500)">₹500</button>
+                        <button class="amount-btn" onclick="selectWithdrawAmount(1000)">₹1000</button>
+                        <button class="amount-btn" onclick="selectWithdrawAmount(2000)">₹2000</button>
+                        <button class="amount-btn" onclick="selectWithdrawAmount(5000)">₹5000</button>
+                        <button class="amount-btn" onclick="selectWithdrawAmount('all')">All</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Or Enter Custom Amount</label>
+                    <input 
+                        type="number" 
+                        class="form-input" 
+                        placeholder="Enter amount"
+                        id="withdrawAmount"
+                        min="100"
+                    >
+                </div>
+
+                <button class="submit-button" onclick="processWithdraw()">WITHDRAW NOW</button>
+                
+                <div class="info-text">
+                    ℹ️ Minimum withdrawal: ₹100<br>
+                    Withdrawals are processed within 24-48 hours<br>
+                    Please ensure your bank account is verified
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedAmount = 0;
+        let selectedWithdrawAmount = 0;
+
+        // Add Cash Modal
+        function openAddCashModal() {
+            document.getElementById('addCashModal').classList.add('show');
+        }
+
+        function closeAddCashModal() {
+            document.getElementById('addCashModal').classList.remove('show');
+            document.getElementById('customAmount').value = '';
+            selectedAmount = 0;
+            document.querySelectorAll('.amount-btn').forEach(btn => btn.classList.remove('active'));
+        }
+
+        function selectAmount(amount) {
+            selectedAmount = amount;
+            document.getElementById('customAmount').value = amount;
+            document.querySelectorAll('#addCashModal .amount-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function processCashAdd() {
+            const amount = document.getElementById('customAmount').value || selectedAmount;
+            
+            if (!amount || amount < 100) {
+                alert('Minimum deposit amount is ₹100');
+                return;
+            }
+
+            if (amount > 100000) {
+                alert('Maximum deposit amount is ₹100,000');
+                return;
+            }
+
+            // Redirect to payment gateway
+            alert('Processing payment of ₹' + amount);
+            closeAddCashModal();
+            // window.location.href = 'payment.html?amount=' + amount;
+        }
+
+        // Withdraw Modal
+        function openWithdrawModal() {
+            document.getElementById('withdrawModal').classList.add('show');
+        }
+
+        function closeWithdrawModal() {
+            document.getElementById('withdrawModal').classList.remove('show');
+            document.getElementById('withdrawAmount').value = '';
+            selectedWithdrawAmount = 0;
+            document.querySelectorAll('.amount-btn').forEach(btn => btn.classList.remove('active'));
+        }
+
+        function selectWithdrawAmount(amount) {
+            if (amount === 'all') {
+                selectedWithdrawAmount = 0; // Set to available balance
+                document.getElementById('withdrawAmount').value = 0;
+            } else {
+                selectedWithdrawAmount = amount;
+                document.getElementById('withdrawAmount').value = amount;
+            }
+            document.querySelectorAll('#withdrawModal .amount-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function processWithdraw() {
+            const amount = document.getElementById('withdrawAmount').value || selectedWithdrawAmount;
+            
+            if (!amount || amount < 100) {
+                alert('Minimum withdrawal amount is ₹100');
+                return;
+            }
+
+            if (amount > 0) { // Check against actual balance
+                alert('Processing withdrawal of ₹' + amount);
+                closeWithdrawModal();
+                // window.location.href = 'withdrawal-success.html';
+            }
+        }
+
+        // Close modals when clicking outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(event) {
+                if (event.target === this) {
+                    if (this.id === 'addCashModal') {
+                        closeAddCashModal();
+                    } else if (this.id === 'withdrawModal') {
+                        closeWithdrawModal();
+                    }
+                }
+            });
+        });
+
+        // Promotional Banner
+        function openPromotion() {
+            window.location.href = 'promotion.html';
+        }
+
+        // Carousel auto-slide
+        const dots = document.querySelectorAll('.dot');
+        let currentDot = 0;
+
+        setInterval(() => {
+            dots[currentDot].classList.remove('active');
+            currentDot = (currentDot + 1) % dots.length;
+            dots[currentDot].classList.add('active');
+        }, 4000);
+
+        // Navigation functions
+        function openNotifications() {
+            alert('🔔 You have 3 new notifications');
+            // window.location.href = 'notifications.html';
+        }
+
+        // Bottom navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

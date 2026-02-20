@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Play - Promotions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(180deg, #0a1628 0%, #162447 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: linear-gradient(180deg, #0d1b2a 0%, #1b263b 100%);
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 90px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(180deg, #0a1628 0%, #162447 100%);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-img {
+            height: 45px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .logo-text {
+            color: white;
+            font-weight: bold;
+            font-size: 22px;
+        }
+
+        .notification-btn {
+            position: relative;
+            background: rgba(255, 165, 0, 0.15);
+            border: 2px solid #ffa500;
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .notification-btn:hover {
+            background: rgba(255, 165, 0, 0.25);
+            transform: scale(1.05);
+        }
+
+        .notification-icon {
+            font-size: 22px;
+            color: #ffa500;
+        }
+
+        /* Promotion Section */
+        .promotion-section {
+            padding: 15px;
+        }
+
+        .section-title {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .title-icon {
+            font-size: 24px;
+        }
+
+        /* Promotion Cards */
+        .promotion-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .promo-card {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 165, 0, 0.2);
+            height: 140px;
+        }
+
+        .promo-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 165, 0, 0.4);
+            border-color: rgba(255, 165, 0, 0.5);
+        }
+
+        .promo-card:active {
+            transform: translateY(-1px);
+        }
+
+        .promo-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Terms & Conditions */
+        .terms-section {
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid rgba(255, 165, 0, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px;
+        }
+
+        .terms-title {
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .terms-list {
+            color: #94a3b8;
+            font-size: 12px;
+            line-height: 1.7;
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .terms-list li {
+            padding-left: 20px;
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .terms-list li::before {
+            content: '•';
+            color: #ffa500;
+            font-weight: bold;
+            position: absolute;
+            left: 8px;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 480px;
+            width: 100%;
+            background: linear-gradient(180deg, #0a1628 0%, #000000 100%);
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            border-top: 2px solid rgba(255, 165, 0, 0.3);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 5px 15px;
+            text-decoration: none;
+        }
+
+        .nav-item.active {
+            color: #ffa500;
+        }
+
+        .nav-item:hover {
+            color: #ffa500;
+            transform: translateY(-2px);
+        }
+
+        .nav-icon {
+            font-size: 24px;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Modal for Promotion Details */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(180deg, #0d1b2a 0%, #1b263b 100%);
+            padding: 25px 20px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 380px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 165, 0, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .modal-title {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            font-size: 26px;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: white;
+        }
+
+        .modal-body {
+            color: #e2e8f0;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .modal-body h3 {
+            color: #ffa500;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+
+        .modal-body ul {
+            padding-left: 18px;
+            margin-bottom: 15px;
+        }
+
+        .modal-body li {
+            margin-bottom: 6px;
+        }
+
+        .modal-body p {
+            line-height: 1.8;
+        }
+
+        .claim-button {
+            width: 100%;
+            background: linear-gradient(135deg, #ffa500 0%, #ff8c00 100%);
+            border: none;
+            color: white;
+            padding: 14px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 165, 0, 0.4);
+            margin-top: 18px;
+        }
+
+        .claim-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 165, 0, 0.6);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+       <!-- Header with Logo and Notification -->
+        <div class="header">
+            <div class="logo-container">
+                <img src="quickplay logo.jpeg" alt="Quick Play" class="logo-img"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div class="logo-text" style="display:none;">Quick PLAY</div>
+            </div>
+            
+            <div class="notification-btn" onclick="openNotifications()">
+                <span class="notification-icon">🔔</span>
+            </div>
+        </div>
+
+        <!-- Promotions Section -->
+        <div class="promotion-section">
+            <div class="section-title">
+                <span class="title-icon">📢</span>
+                <span>Active Promotions</span>
+            </div>
+
+            <div class="promotion-cards">
+                <!-- Promotion 1: Use Wheeler For Coins -->
+                <div class="promo-card" onclick="openPromoModal('wheel')">
+                    <img src="spin wheel.jpeg" alt="Use Wheeler For Coins" class="promo-image">
+                </div>
+
+                <!-- Promotion 2: New Rewards -->
+                <div class="promo-card" onclick="openPromoModal('rewards')">
+                    <img src="new rewards.jpeg" alt="New Rewards" class="promo-image">
+                </div>
+
+                <!-- Promotion 3: New Game Launched -->
+                <div class="promo-card" onclick="openPromoModal('game')">
+                    <img src="new game launched.png" alt="New Game Launched" class="promo-image">
+                </div>
+
+                <!-- Promotion 4: Referral Program -->
+                <div class="promo-card" onclick="openPromoModal('referral')">
+                    <img src="refer and get reward.jpeg" alt="Refer & Earn" class="promo-image">
+                </div>
+
+                <!-- Promotion 5: More Promotions -->
+                <div class="promo-card" onclick="openPromoModal('more')">
+                    <img src="new rewards.jpeg" alt="More Promotions" class="promo-image">
+                </div>
+            </div>
+        </div>
+
+        <!-- Terms & Conditions -->
+        <div class="terms-section">
+            <div class="terms-title">
+                <span>📋</span>
+                <span>Terms & Conditions</span>
+            </div>
+            <ul class="terms-list">
+                <li>All promotions are subject to availability and may change without notice</li>
+                <li>Players must be 18 years or older to participate in any promotion</li>
+                <li>Each promotion has specific wagering requirements that must be met</li>
+                <li>Bonus coins cannot be withdrawn directly and must be wagered</li>
+                <li>One promotion per user per day unless otherwise stated</li>
+                <li>Quick Play reserves the right to modify or cancel promotions at any time</li>
+                <li>Abuse of promotional offers may result in account suspension</li>
+            </ul>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="games.html" class="nav-item">
+                <div class="nav-icon">🎮</div>
+                <div class="nav-label">Games</div>
+            </a>
+
+            <a href="promotion.html" class="nav-item active">
+                <div class="nav-icon">📢</div>
+                <div class="nav-label">Promotion</div>
+            </a>
+
+            <a href="wallet.html" class="nav-item">
+                <div class="nav-icon">💰</div>
+                <div class="nav-label">Wallet</div>
+            </a>
+
+            <a href="user.html" class="nav-item">
+                <div class="nav-icon">👤</div>
+                <div class="nav-label">User</div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Promotion Detail Modal -->
+    <div class="modal" id="promoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">Promotion Details</div>
+                <button class="modal-close" onclick="closePromoModal()">×</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Content will be dynamically inserted -->
+            </div>
+            <button class="claim-button" onclick="claimPromotion()">CLAIM NOW</button>
+        </div>
+    </div>
+
+    <script>
+        // Promotion data
+        const promotions = {
+            wheel: {
+                title: '🎡 Daily Wheeler For Coins',
+                content: `
+                    <h3>How It Works:</h3>
+                    <ul>
+                        <li>Spin the wheel once every 24 hours</li>
+                        <li>Win between 10 to 10,000 coins per spin</li>
+                        <li>Higher VIP levels get more spins</li>
+                        <li>Special mega prizes on weekends</li>
+                    </ul>
+                    <h3>Rewards:</h3>
+                    <p>• Bronze Tier: 10-100 coins<br>
+                    • Silver Tier: 50-500 coins<br>
+                    • Gold Tier: 100-1,000 coins<br>
+                    • Platinum Tier: 500-5,000 coins<br>
+                    • Diamond Tier: 1,000-10,000 coins</p>
+                `
+            },
+            rewards: {
+                title: '💎 New Treasure Rewards',
+                content: `
+                    <h3>About This Offer:</h3>
+                    <ul>
+                        <li>Open treasure chests daily for rewards</li>
+                        <li>Find coins, free spins, and bonus multipliers</li>
+                        <li>Complete challenges to unlock rare chests</li>
+                        <li>Limited time special edition chests</li>
+                    </ul>
+                    <h3>Chest Types:</h3>
+                    <p>• Common Chest: 10-50 coins<br>
+                    • Rare Chest: 50-200 coins<br>
+                    • Epic Chest: 200-1,000 coins<br>
+                    • Legendary Chest: 1,000-5,000 coins<br>
+                    • Mythic Chest: 5,000+ coins + bonuses</p>
+                `
+            },
+            game: {
+                title: '🎮 New Game Launch Special',
+                content: `
+                    <h3>Welcome Bonus:</h3>
+                    <ul>
+                        <li>Get 500 free coins to try new games</li>
+                        <li>No deposit required for first play</li>
+                        <li>Win real coins with your bonus</li>
+                        <li>Special 50% win boost for 24 hours</li>
+                    </ul>
+                    <h3>Featured Games:</h3>
+                    <p>• Poker Master - Classic card game<br>
+                    • Slot Mania - 100+ themed slots<br>
+                    • Blackjack Pro - Beat the dealer<br>
+                    • Roulette Royale - European & American<br>
+                    • Baccarat Elite - High stakes action</p>
+                `
+            },
+            referral: {
+                title: '👥 Refer & Earn Program',
+                content: `
+                    <h3>How To Earn:</h3>
+                    <ul>
+                        <li>Share your unique referral code</li>
+                        <li>Get 100 coins when friend registers</li>
+                        <li>Get 10% of their first deposit as bonus</li>
+                        <li>Unlimited referrals - no cap!</li>
+                    </ul>
+                    <h3>Bonus Structure:</h3>
+                    <p>• Friend Signs Up: 100 coins<br>
+                    • Friend Deposits ₹100: 10 coins<br>
+                    • Friend Deposits ₹500: 50 coins<br>
+                    • Friend Deposits ₹1000: 100 coins<br>
+                    • 5+ Referrals: VIP Status Upgrade</p>
+                `
+            },
+            more: {
+                title: '🎁 More Exciting Promotions',
+                content: `
+                    <h3>Stay Updated:</h3>
+                    <ul>
+                        <li>New promotions added weekly</li>
+                        <li>Special festival and holiday bonuses</li>
+                        <li>Exclusive VIP member promotions</li>
+                        <li>Tournament prizes and competitions</li>
+                    </ul>
+                    <h3>Coming Soon:</h3>
+                    <p>• Loyalty Point System<br>
+                    • Cashback Rewards<br>
+                    • Weekend Bonus Specials<br>
+                    • Birthday Bonuses<br>
+                    • Mystery Prize Drops</p>
+                `
+            }
+        };
+
+        // Open promotion modal
+        function openPromoModal(promoType) {
+            const promo = promotions[promoType];
+            if (!promo) return;
+
+            document.getElementById('modalTitle').innerHTML = promo.title;
+            document.getElementById('modalBody').innerHTML = promo.content;
+            document.getElementById('promoModal').classList.add('show');
+        }
+
+        // Close promotion modal
+        function closePromoModal() {
+            document.getElementById('promoModal').classList.remove('show');
+        }
+
+        // Claim promotion
+        function claimPromotion() {
+            // Claim promotion logic here
+            closePromoModal();
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('promoModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closePromoModal();
+            }
+        });
+
+        // Navigation functions
+        function goBack() {
+            window.history.back();
+        }
+
+        function openNotifications() {
+            // Open notifications page
+            // window.location.href = 'notifications.html';
+        }
+
+        function goToPage(page) {
+            if (page === 'games') {
+                window.location.href = 'index.html';
+            } else if (page === 'wallet') {
+                window.location.href = 'wallet.html';
+            } else if (page === 'user') {
+                window.location.href = 'user.html';
+            }
+        }
+
+        // Bottom navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

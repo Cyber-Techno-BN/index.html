@@ -1,0 +1,1666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Play - Transactions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(180deg, #0a1628 0%, #162447 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: linear-gradient(180deg, #0d1b2a 0%, #1b263b 100%);
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 100px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(180deg, #0a1628 0%, #162447 100%);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            background: rgba(255, 165, 0, 0.15);
+            border: 2px solid #ffa500;
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 165, 0, 0.25);
+            transform: scale(1.05);
+        }
+
+        .back-icon {
+            font-size: 22px;
+            color: #ffa500;
+        }
+
+        .header-title {
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-btn {
+            background: rgba(255, 165, 0, 0.15);
+            border: 2px solid #ffa500;
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .search-btn:hover {
+            background: rgba(255, 165, 0, 0.25);
+            transform: scale(1.05);
+        }
+
+        .search-icon {
+            font-size: 20px;
+            color: #ffa500;
+        }
+
+        /* Search Container */
+        .search-container {
+            padding: 0 15px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+
+        .search-container.show {
+            max-height: 80px;
+            padding: 15px;
+        }
+
+        .search-input-wrapper {
+            display: flex;
+            align-items: center;
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid rgba(148, 163, 184, 0.2);
+            border-radius: 25px;
+            padding: 12px 18px;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .search-input-wrapper:focus-within {
+            border-color: #ffa500;
+            background: rgba(30, 41, 59, 0.8);
+        }
+
+        .search-prefix {
+            font-size: 18px;
+            color: #94a3b8;
+        }
+
+        .search-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: #64748b;
+        }
+
+        .search-clear {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        .search-clear:hover {
+            color: white;
+        }
+
+        .search-input:not(:placeholder-shown) ~ .search-clear {
+            display: flex;
+        }
+
+        /* Summary Cards */
+        .summary-section {
+            padding: 8px 15px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .quick-stats {
+            padding: 8px 15px;
+            margin-bottom: 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, rgba(255, 165, 0, 0.1) 0%, rgba(255, 140, 0, 0.05) 100%);
+            border: 1.5px solid rgba(255, 165, 0, 0.2);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .stat-label {
+            color: #94a3b8;
+            font-size: 10px;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .stat-value.win-rate {
+            color: #10b981;
+        }
+
+        .profit-loss-bar {
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 8px;
+            height: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .profit-loss-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981 0%, #ffa500 100%);
+            transition: width 0.5s ease;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+            border-radius: 10px;
+            padding: 10px 8px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 165, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 165, 0, 0.3);
+            border-color: #ffa500;
+        }
+
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 165, 0, 0.08) 0%, transparent 70%);
+        }
+
+        .summary-icon {
+            font-size: 24px;
+            margin-bottom: 6px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+
+        .summary-label {
+            color: #cbd5e1;
+            font-size: 10px;
+            margin-bottom: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .summary-amount {
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .summary-amount.positive {
+            color: #10b981;
+        }
+
+        .summary-amount.negative {
+            color: #ef4444;
+        }
+
+        /* Tab Navigation */
+        .tab-navigation {
+            padding: 8px 15px;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            background: transparent;
+        }
+
+        .tab-navigation::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-btn {
+            background: rgba(30, 58, 95, 0.6);
+            border: 1.5px solid rgba(148, 163, 184, 0.3);
+            border-radius: 20px;
+            padding: 8px 16px;
+            color: #cbd5e1;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #ffa500 0%, #ff8c00 100%);
+            border-color: #ffa500;
+            color: white;
+            box-shadow: 0 2px 8px rgba(255, 165, 0, 0.4);
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 165, 0, 0.2);
+            border-color: #ffa500;
+            color: #ffa500;
+        }
+
+        /* Transaction List */
+        .transaction-section {
+            padding: 0 15px 15px;
+        }
+
+        .date-group {
+            margin-bottom: 15px;
+        }
+
+        .date-header {
+            color: #e2e8f0;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            background: rgba(255, 165, 0, 0.1);
+            border-radius: 6px;
+            border-left: 3px solid #ffa500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .date-header::before {
+            content: '📅';
+            font-size: 16px;
+        }
+
+        .transaction-card {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1.5px solid rgba(59, 130, 246, 0.3);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .transaction-card:hover {
+            transform: translateY(-1px);
+            border-color: rgba(255, 165, 0, 0.4);
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .transaction-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: #ffa500;
+        }
+
+        .transaction-card.deposit::before {
+            background: #10b981;
+        }
+
+        .transaction-card.withdrawal::before {
+            background: #ef4444;
+        }
+
+        .transaction-card.betting::before {
+            background: #ffa500;
+        }
+
+        .transaction-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .transaction-left {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex: 1;
+        }
+
+        .transaction-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            background: rgba(255, 165, 0, 0.15);
+            border: 1.5px solid rgba(255, 165, 0, 0.3);
+            flex-shrink: 0;
+        }
+
+        .transaction-icon.deposit {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .transaction-icon.withdrawal {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .transaction-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .transaction-title {
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .transaction-subtitle {
+            color: #94a3b8;
+            font-size: 11px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .transaction-amount {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .amount-value {
+            font-weight: bold;
+            font-size: 15px;
+            margin-bottom: 3px;
+        }
+
+        .amount-value.positive {
+            color: #10b981;
+        }
+
+        .amount-value.negative {
+            color: #ef4444;
+        }
+
+        .amount-value.neutral {
+            color: #ffa500;
+        }
+
+        .transaction-status {
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .status-success {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-pending {
+            background: rgba(255, 165, 0, 0.2);
+            color: #ffa500;
+            border: 1px solid rgba(255, 165, 0, 0.3);
+        }
+
+        .status-failed {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .transaction-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        .transaction-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 6px;
+            background: rgba(255, 165, 0, 0.1);
+            border: 1px solid rgba(255, 165, 0, 0.3);
+            border-radius: 6px;
+            color: #ffa500;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 165, 0, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .action-btn.support {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: rgba(59, 130, 246, 0.3);
+            color: #3b82f6;
+        }
+
+        .action-btn.support:hover {
+            background: rgba(59, 130, 246, 0.2);
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .detail-label {
+            color: #94a3b8;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .detail-value {
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 30px;
+        }
+
+        .empty-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .empty-text {
+            color: #94a3b8;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Filter Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(180deg, #0d1b2a 0%, #1b263b 100%);
+            padding: 25px 20px;
+            border-radius: 20px 20px 0 0;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 165, 0, 0.3);
+            border-bottom: none;
+            animation: slideUp 0.3s ease;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            font-size: 26px;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: white;
+        }
+
+        .filter-section {
+            margin-bottom: 20px;
+        }
+
+        .filter-label {
+            color: #e2e8f0;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .filter-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .filter-option {
+            padding: 12px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid rgba(148, 163, 184, 0.2);
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .filter-option:hover, .filter-option.active {
+            background: rgba(255, 165, 0, 0.2);
+            border-color: #ffa500;
+            color: #ffa500;
+        }
+
+        .filter-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .filter-btn-secondary {
+            padding: 14px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid rgba(148, 163, 184, 0.2);
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn-secondary:hover {
+            background: rgba(30, 41, 59, 0.8);
+        }
+
+        .filter-btn-primary {
+            padding: 14px;
+            background: linear-gradient(135deg, #ffa500 0%, #ff8c00 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 165, 0, 0.4);
+        }
+
+        .filter-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 165, 0, 0.6);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 480px;
+            width: 100%;
+            background: linear-gradient(180deg, #0a1628 0%, #000000 100%);
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            border-top: 2px solid rgba(255, 165, 0, 0.3);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 5px 15px;
+            text-decoration: none;
+        }
+
+        .nav-item.active {
+            color: #ffa500;
+        }
+
+        .nav-item:hover {
+            color: #ffa500;
+            transform: translateY(-2px);
+        }
+
+        .nav-icon {
+            font-size: 24px;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto 10px;
+            border: 4px solid rgba(255, 165, 0, 0.2);
+            border-top: 4px solid #ffa500;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <a href="user.html" class="back-btn">
+                    <span class="back-icon">←</span>
+                </a>
+                <div class="header-title">Transactions</div>
+            </div>
+            
+            <div class="header-right">
+                <div class="search-btn" onclick="toggleSearch()">
+                    <span class="search-icon">🔍</span>
+                </div>
+                <div class="search-btn" onclick="openFilterModal()">
+                    <span class="search-icon">⚙️</span>
+                </div>
+                <div class="search-btn" onclick="exportTransactions()">
+                    <span class="search-icon">📥</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Bar (Hidden by default) -->
+        <div class="search-container" id="searchContainer">
+            <div class="search-input-wrapper">
+                <span class="search-prefix">🔍</span>
+                <input type="text" class="search-input" id="searchInput" placeholder="Search by transaction ID, game name, amount..." oninput="searchTransactions()">
+                <button class="search-clear" onclick="clearSearch()">×</button>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="quick-stats">
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-label">Win Rate</div>
+                    <div class="stat-value win-rate">64.5%</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Total Games</div>
+                    <div class="stat-value">156</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Net Profit</div>
+                    <div class="stat-value" style="color: #10b981;">+₹7,250</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Biggest Win</div>
+                    <div class="stat-value" style="color: #ffa500;">₹3,500</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-section">
+            <div class="summary-card">
+                <div class="summary-icon">💰</div>
+                <div class="summary-label">Total Deposits</div>
+                <div class="summary-amount positive">₹15,450</div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-icon">💸</div>
+                <div class="summary-label">Total Withdrawals</div>
+                <div class="summary-amount negative">₹8,200</div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-icon">🎮</div>
+                <div class="summary-label">Total Bets</div>
+                <div class="summary-amount">₹12,680</div>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <button class="tab-btn active" onclick="switchTab('all')">All</button>
+            <button class="tab-btn" onclick="switchTab('deposits')">Deposits</button>
+            <button class="tab-btn" onclick="switchTab('withdrawals')">Withdrawals</button>
+            <button class="tab-btn" onclick="switchTab('betting')">Game Betting</button>
+        </div>
+
+        <!-- Transaction List -->
+        <div class="transaction-section" id="transactionList">
+            <!-- Today -->
+            <div class="date-group">
+                <div class="date-header">Today, Jan 08, 2026</div>
+                
+                <!-- Betting Transaction -->
+                <div class="transaction-card betting">
+                    <div class="transaction-header" onclick="showTransactionDetails('bet001')" style="cursor: pointer;">
+                        <div class="transaction-left">
+                            <div class="transaction-icon">
+                                🎮
+                            </div>
+                            <div class="transaction-info">
+                                <div class="transaction-title">Color Prediction Game</div>
+                                <div class="transaction-subtitle">Bet #CP45687231</div>
+                            </div>
+                        </div>
+                        <div class="transaction-amount">
+                            <div class="amount-value positive">+₹850</div>
+                            <span class="transaction-status status-success">Won</span>
+                        </div>
+                    </div>
+                    <div class="transaction-details" onclick="showTransactionDetails('bet001')" style="cursor: pointer;">
+                        <div class="detail-item">
+                            <span class="detail-label">Bet Amount</span>
+                            <span class="detail-value">₹500</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Profit</span>
+                            <span class="detail-value">₹350</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Time</span>
+                            <span class="detail-value">02:45 PM</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Period</span>
+                            <span class="detail-value">#20260108145</span>
+                        </div>
+                    </div>
+                    <div class="transaction-actions">
+                        <button class="action-btn" onclick="event.stopPropagation(); downloadReceipt('bet001')">📄 Receipt</button>
+                        <button class="action-btn" onclick="event.stopPropagation(); shareTransaction('bet001')">📤 Share</button>
+                        <button class="action-btn support" onclick="event.stopPropagation(); contactSupport('bet001')">💬 Support</button>
+                    </div>
+                </div>
+
+                <!-- Deposit Transaction -->
+                <div class="transaction-card deposit">
+                    <div class="transaction-header" onclick="showTransactionDetails('dep001')" style="cursor: pointer;">
+                        <div class="transaction-left">
+                            <div class="transaction-icon deposit">
+                                💳
+                            </div>
+                            <div class="transaction-info">
+                                <div class="transaction-title">Add Cash</div>
+                                <div class="transaction-subtitle">UPI - XXXX@paytm</div>
+                            </div>
+                        </div>
+                        <div class="transaction-amount">
+                            <div class="amount-value positive">+₹2,000</div>
+                            <span class="transaction-status status-success">Success</span>
+                        </div>
+                    </div>
+                    <div class="transaction-details" onclick="showTransactionDetails('dep001')" style="cursor: pointer;">
+                        <div class="detail-item">
+                            <span class="detail-label">Transaction ID</span>
+                            <span class="detail-value">TXN1234567890</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Time</span>
+                            <span class="detail-value">11:23 AM</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Payment Method</span>
+                            <span class="detail-value">UPI</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Processing Fee</span>
+                            <span class="detail-value">₹0</span>
+                        </div>
+                    </div>
+                    <div class="transaction-actions">
+                        <button class="action-btn" onclick="event.stopPropagation(); downloadReceipt('dep001')">📄 Receipt</button>
+                        <button class="action-btn" onclick="event.stopPropagation(); shareTransaction('dep001')">📤 Share</button>
+                        <button class="action-btn support" onclick="event.stopPropagation(); contactSupport('dep001')">💬 Support</button>
+                    </div>
+                </div>
+
+                <!-- Betting Transaction (Lost) -->
+                <div class="transaction-card betting" onclick="showTransactionDetails('bet002')">
+                    <div class="transaction-header">
+                        <div class="transaction-left">
+                            <div class="transaction-icon">
+                                🎲
+                            </div>
+                            <div class="transaction-info">
+                                <div class="transaction-title">Dice Roll Game</div>
+                                <div class="transaction-subtitle">Bet #DR45687230</div>
+                            </div>
+                        </div>
+                        <div class="transaction-amount">
+                            <div class="amount-value negative">-₹300</div>
+                            <span class="transaction-status status-failed">Lost</span>
+                        </div>
+                    </div>
+                    <div class="transaction-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Bet Amount</span>
+                            <span class="detail-value">₹300</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Result</span>
+                            <span class="detail-value">Number: 4</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Time</span>
+                            <span class="detail-value">09:15 AM</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Round</span>
+                            <span class="detail-value">#20260108090</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Yesterday -->
+            <div class="date-group">
+                <div class="date-header">Yesterday, Jan 07, 2026</div>
+                
+                <!-- Withdrawal Transaction -->
+                <div class="transaction-card withdrawal">
+                    <div class="transaction-header" onclick="showTransactionDetails('with001')" style="cursor: pointer;">
+                        <div class="transaction-left">
+                            <div class="transaction-icon withdrawal">
+                                🏦
+                            </div>
+                            <div class="transaction-info">
+                                <div class="transaction-title">Withdrawal</div>
+                                <div class="transaction-subtitle">Bank - ICICI XXXX4567</div>
+                            </div>
+                        </div>
+                        <div class="transaction-amount">
+                            <div class="amount-value negative">-₹5,000</div>
+                            <span class="transaction-status status-success">Success</span>
+                        </div>
+                    </div>
+                    <div class="transaction-details" onclick="showTransactionDetails('with001')" style="cursor: pointer;">
+                        <div class="detail-item">
+                            <span class="detail-label">Transaction ID</span>
+                            <span class="detail-value">WTH9876543210</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Time</span>
+                            <span class="detail-value">04:30 PM</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Bank Account</span>
+                            <span class="detail-value">ICICI</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Processing Fee</span>
+                            <span class="detail-value">₹0</span>
+                        </div>
+                    </div>
+                    <div class="transaction-actions">
+                        <button class="action-btn" onclick="event.stopPropagation(); downloadReceipt('with001')">📄 Receipt</button>
+                        <button class="action-btn" onclick="event.stopPropagation(); shareTransaction('with001')">📤 Share</button>
+                        <button class="action-btn support" onclick="event.stopPropagation(); contactSupport('with001')">💬 Support</button>
+                    </div>
+                </div>
+
+                <!-- Betting Transaction (Won) -->
+                <div class="transaction-card betting">
+                    <div class="transaction-header" onclick="showTransactionDetails('bet003')" style="cursor: pointer;">
+                        <div class="transaction-left">
+                            <div class="transaction-icon">
+                                🎯
+                            </div>
+                            <div class="transaction-info">
+                                <div class="transaction-title">Spin & Win</div>
+                                <div class="transaction-subtitle">Bet #SW45687229</div>
+                            </div>
+                        </div>
+                        <div class="transaction-amount">
+                            <div class="amount-value positive">+₹1,200</div>
+                            <span class="transaction-status status-success">Won</span>
+                        </div>
+                    </div>
+                    <div class="transaction-details" onclick="showTransactionDetails('bet003')" style="cursor: pointer;">
+                        <div class="detail-item">
+                            <span class="detail-label">Bet Amount</span>
+                            <span class="detail-value">₹600</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Multiplier</span>
+                            <span class="detail-value">2.0x</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Time</span>
+                            <span class="detail-value">02:20 PM</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Spin ID</span>
+                            <span class="detail-value">#20260107142</span>
+                        </div>
+                    </div>
+                    <div class="transaction-actions">
+                        <button class="action-btn" onclick="event.stopPropagation(); downloadReceipt('bet003')">📄 Receipt</button>
+                        <button class="action-btn" onclick="event.stopPropagation(); shareTransaction('bet003')">📤 Share</button>
+                        <button class="action-btn support" onclick="event.stopPropagation(); contactSupport('bet003')">💬 Support</button>
+                    </div>
+                </div>
+
+                <!-- Deposit Transaction -->
+                <div class="transaction-card deposit" onclick="showTransactionDetails('dep002')">
+                    <div class="transaction-header">
+                        <div class="transaction-left">
+                            <div class="transaction-icon deposit">
+                                💳
+                            </div>
+                            <div class="transaction-info">
+                                <div class="transaction-title">Add Cash</div>
+                                <div class="transaction-subtitle">Card - XXXX4321</div>
+                            </div>
+                        </div>
+                        <div class="transaction-amount">
+                            <div class="amount-value positive">+₹1,500</div>
+                            <span class="transaction-status status-success">Success</span>
+                        </div>
+                    </div>
+                    <div class="transaction-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Transaction ID</span>
+                            <span class="detail-value">TXN2345678901</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Time</span>
+                            <span class="detail-value">10:45 AM</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Payment Method</span>
+                            <span class="detail-value">Debit Card</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Processing Fee</span>
+                            <span class="detail-value">₹0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Betting Transaction (Lost) -->
+                <div class="transaction-card betting" onclick="showTransactionDetails('bet004')">
+                    <div class="transaction-header">
+                        <div class="transaction-left">
+                            <div class="transaction-icon">
+                                🃏
+                            </div>
+                            <div class="transaction-info">
+                                <div class="transaction-title">Card Battle</div>
+                                <div class="transaction-subtitle">Bet #CB45687228</div>
+                            </div>
+                        </div>
+                        <div class="transaction-amount">
+                            <div class="amount-value negative">-₹450</div>
+                            <span class="transaction-status status-failed">Lost</span>
+                        </div>
+                    </div>
+                    <div class="transaction-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Bet Amount</span>
+                            <span class="detail-value">₹450</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Card Drawn</span>
+                            <span class="detail-value">5♠</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Time</span>
+                            <span class="detail-value">08:30 AM</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Game ID</span>
+                            <span class="detail-value">#20260107083</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- January 6, 2026 -->
+            <div class="date-group">
+                <div class="date-header">Jan 06, 2026</div>
+                
+                <!-- Withdrawal Transaction (Pending) -->
+                <div class="transaction-card withdrawal" onclick="showTransactionDetails('with002')">
+                    <div class="transaction-header">
+                        <div class="transaction-left">
+                            <div class="transaction-icon withdrawal">
+                                🏦
+                            </div>
+                            <div class="transaction-info">
+                                <div class="transaction-title">Withdrawal</div>
+                                <div class="transaction-subtitle">Bank - HDFC XXXX8901</div>
+                            </div>
+                        </div>
+                        <div class="transaction-amount">
+                            <div class="amount-value negative">-₹3,200</div>
+                            <span class="transaction-status status-pending">Processing</span>
+                        </div>
+                    </div>
+                    <div class="transaction-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Transaction ID</span>
+                            <span class="detail-value">WTH8765432109</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Time</span>
+                            <span class="detail-value">06:15 PM</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Bank Account</span>
+                            <span class="detail-value">HDFC</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">ETA</span>
+                            <span class="detail-value">24-48 hours</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Deposit Transaction -->
+                <div class="transaction-card deposit" onclick="showTransactionDetails('dep003')">
+                    <div class="transaction-header">
+                        <div class="transaction-left">
+                            <div class="transaction-icon deposit">
+                                💳
+                            </div>
+                            <div class="transaction-info">
+                                <div class="transaction-title">Add Cash</div>
+                                <div class="transaction-subtitle">UPI - XXXX@oksbi</div>
+                            </div>
+                        </div>
+                        <div class="transaction-amount">
+                            <div class="amount-value positive">+₹5,000</div>
+                            <span class="transaction-status status-success">Success</span>
+                        </div>
+                    </div>
+                    <div class="transaction-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Transaction ID</span>
+                            <span class="detail-value">TXN3456789012</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Time</span>
+                            <span class="detail-value">03:10 PM</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Payment Method</span>
+                            <span class="detail-value">UPI</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Processing Fee</span>
+                            <span class="detail-value">₹0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Betting Transactions -->
+                <div class="transaction-card betting" onclick="showTransactionDetails('bet005')">
+                    <div class="transaction-header">
+                        <div class="transaction-left">
+                            <div class="transaction-icon">
+                                🎰
+                            </div>
+                            <div class="transaction-info">
+                                <div class="transaction-title">Slot Machine</div>
+                                <div class="transaction-subtitle">Bet #SM45687227</div>
+                            </div>
+                        </div>
+                        <div class="transaction-amount">
+                            <div class="amount-value positive">+₹3,500</div>
+                            <span class="transaction-status status-success">Won</span>
+                        </div>
+                    </div>
+                    <div class="transaction-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Bet Amount</span>
+                            <span class="detail-value">₹1,000</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Multiplier</span>
+                            <span class="detail-value">3.5x</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Time</span>
+                            <span class="detail-value">01:45 PM</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Spin Result</span>
+                            <span class="detail-value">🍒🍒🍒</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="transaction-card betting" onclick="showTransactionDetails('bet006')">
+                    <div class="transaction-header">
+                        <div class="transaction-left">
+                            <div class="transaction-icon">
+                                🎮
+                            </div>
+                            <div class="transaction-info">
+                                <div class="transaction-title">Color Prediction Game</div>
+                                <div class="transaction-subtitle">Bet #CP45687226</div>
+                            </div>
+                        </div>
+                        <div class="transaction-amount">
+                            <div class="amount-value negative">-₹700</div>
+                            <span class="transaction-status status-failed">Lost</span>
+                        </div>
+                    </div>
+                    <div class="transaction-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Bet Amount</span>
+                            <span class="detail-value">₹700</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Your Choice</span>
+                            <span class="detail-value">Green</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Time</span>
+                            <span class="detail-value">11:20 AM</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Result</span>
+                            <span class="detail-value">Red</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading" id="loadingState">
+            <div class="spinner"></div>
+            <div class="loading-text">Loading transactions...</div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="games.html" class="nav-item">
+                <div class="nav-icon">🎮</div>
+                <div class="nav-label">Games</div>
+            </a>
+
+            <a href="promotion.html" class="nav-item">
+                <div class="nav-icon">📢</div>
+                <div class="nav-label">Promotion</div>
+            </a>
+
+            <a href="wallet.html" class="nav-item">
+                <div class="nav-icon">💰</div>
+                <div class="nav-label">Wallet</div>
+            </a>
+
+            <a href="user.html" class="nav-item active">
+                <div class="nav-icon">👤</div>
+                <div class="nav-label">User</div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter Modal -->
+    <div class="modal" id="filterModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">🔍 Filter Transactions</div>
+                <button class="modal-close" onclick="closeFilterModal()">×</button>
+            </div>
+            
+            <div class="filter-section">
+                <label class="filter-label">Date Range</label>
+                <div class="filter-options">
+                    <div class="filter-option active" data-filter="today">Today</div>
+                    <div class="filter-option" data-filter="week">This Week</div>
+                    <div class="filter-option" data-filter="month">This Month</div>
+                    <div class="filter-option" data-filter="all">All Time</div>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <label class="filter-label">Transaction Type</label>
+                <div class="filter-options">
+                    <div class="filter-option active" data-type="all">All</div>
+                    <div class="filter-option" data-type="deposit">Deposits</div>
+                    <div class="filter-option" data-type="withdrawal">Withdrawals</div>
+                    <div class="filter-option" data-type="betting">Betting</div>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <label class="filter-label">Status</label>
+                <div class="filter-options">
+                    <div class="filter-option active" data-status="all">All</div>
+                    <div class="filter-option" data-status="success">Success</div>
+                    <div class="filter-option" data-status="pending">Pending</div>
+                    <div class="filter-option" data-status="failed">Failed</div>
+                </div>
+            </div>
+
+            <div class="filter-buttons">
+                <button class="filter-btn-secondary" onclick="resetFilters()">Reset</button>
+                <button class="filter-btn-primary" onclick="applyFilters()">Apply Filters</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Search Functionality
+        function toggleSearch() {
+            const searchContainer = document.getElementById('searchContainer');
+            const searchInput = document.getElementById('searchInput');
+            
+            if (searchContainer.classList.contains('show')) {
+                searchContainer.classList.remove('show');
+                searchInput.value = '';
+                searchTransactions(); // Reset search
+            } else {
+                searchContainer.classList.add('show');
+                setTimeout(() => searchInput.focus(), 300);
+            }
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            searchTransactions();
+        }
+
+        function searchTransactions() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.transaction-card');
+            
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Hide empty date groups
+            document.querySelectorAll('.date-group').forEach(group => {
+                const visibleCards = group.querySelectorAll('.transaction-card[style*="display: block"], .transaction-card:not([style*="display: none"])');
+                group.style.display = visibleCards.length > 0 ? 'block' : 'none';
+            });
+        }
+
+        // Export Transactions
+        function exportTransactions() {
+            const options = [
+                '📊 Export as Excel',
+                '📄 Export as PDF',
+                '📧 Email Statement',
+                '📱 Share Summary'
+            ];
+            
+            const choice = prompt('Choose export option:\n\n1. ' + options[0] + '\n2. ' + options[1] + '\n3. ' + options[2] + '\n4. ' + options[3] + '\n\nEnter 1-4:');
+            
+            if (choice >= 1 && choice <= 4) {
+                alert('✅ ' + options[choice - 1] + '\n\nYour transaction report is being prepared and will be ready shortly!');
+            }
+        }
+
+        // Download Receipt
+        function downloadReceipt(transactionId) {
+            alert('📄 Downloading Receipt\n\nTransaction ID: ' + transactionId + '\n\nReceipt will be downloaded as PDF with:\n• Transaction details\n• Game information\n• Amount breakdown\n• Timestamp & verification');
+        }
+
+        // Share Transaction
+        function shareTransaction(transactionId) {
+            alert('📤 Share Transaction\n\nTransaction ID: ' + transactionId + '\n\nShare via:\n• WhatsApp\n• Telegram\n• Copy link\n• Save as image');
+        }
+
+        // Contact Support
+        function contactSupport(transactionId) {
+            alert('💬 Contact Support\n\nTransaction ID: ' + transactionId + '\n\nOur support team will help you with:\n• Transaction queries\n• Dispute resolution\n• Refund requests\n• General assistance\n\nRedirecting to chat...');
+            // window.location.href = 'chatbot.html?ref=' + transactionId;
+        }
+
+        // Tab Switching
+        function switchTab(tab) {
+            // Update active tab button
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Show loading
+            document.getElementById('loadingState').classList.add('show');
+            document.getElementById('transactionList').style.display = 'none';
+
+            // Simulate loading and filter transactions
+            setTimeout(() => {
+                document.getElementById('loadingState').classList.remove('show');
+                document.getElementById('transactionList').style.display = 'block';
+                
+                // In a real app, you would filter the transactions based on the tab
+                filterTransactionsByTab(tab);
+            }, 800);
+        }
+
+        function filterTransactionsByTab(tab) {
+            const allCards = document.querySelectorAll('.transaction-card');
+            
+            allCards.forEach(card => {
+                if (tab === 'all') {
+                    card.style.display = 'block';
+                } else if (tab === 'deposits' && card.classList.contains('deposit')) {
+                    card.style.display = 'block';
+                } else if (tab === 'withdrawals' && card.classList.contains('withdrawal')) {
+                    card.style.display = 'block';
+                } else if (tab === 'betting' && card.classList.contains('betting')) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Hide empty date groups
+            document.querySelectorAll('.date-group').forEach(group => {
+                const visibleCards = group.querySelectorAll('.transaction-card[style*="display: block"], .transaction-card:not([style*="display: none"])');
+                if (tab !== 'all' && visibleCards.length === 0) {
+                    group.style.display = 'none';
+                } else {
+                    group.style.display = 'block';
+                }
+            });
+        }
+
+        // Transaction Details
+        function showTransactionDetails(transactionId) {
+            alert('Transaction Details for: ' + transactionId + '\n\nIn a full implementation, this would open a detailed view with:\n• Full transaction information\n• Receipt download option\n• Support/dispute option\n• Share option');
+        }
+
+        // Filter Modal
+        function openFilterModal() {
+            document.getElementById('filterModal').classList.add('show');
+        }
+
+        function closeFilterModal() {
+            document.getElementById('filterModal').classList.remove('show');
+        }
+
+        // Filter Options Selection
+        document.querySelectorAll('.filter-option').forEach(option => {
+            option.addEventListener('click', function() {
+                // Get the parent section
+                const section = this.closest('.filter-section');
+                // Remove active from siblings
+                section.querySelectorAll('.filter-option').forEach(opt => opt.classList.remove('active'));
+                // Add active to clicked option
+                this.classList.add('active');
+            });
+        });
+
+        function resetFilters() {
+            // Reset all filters to default
+            document.querySelectorAll('.filter-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            
+            // Set first option in each section as active
+            document.querySelectorAll('.filter-section').forEach(section => {
+                section.querySelector('.filter-option').classList.add('active');
+            });
+        }
+
+        function applyFilters() {
+            // Get selected filters
+            const dateFilter = document.querySelector('[data-filter].active')?.dataset.filter;
+            const typeFilter = document.querySelector('[data-type].active')?.dataset.type;
+            const statusFilter = document.querySelector('[data-status].active')?.dataset.status;
+
+            // Show loading
+            document.getElementById('loadingState').classList.add('show');
+            document.getElementById('transactionList').style.display = 'none';
+
+            // Simulate filtering
+            setTimeout(() => {
+                document.getElementById('loadingState').classList.remove('show');
+                document.getElementById('transactionList').style.display = 'block';
+                
+                // In a real app, you would apply these filters to the transaction list
+                console.log('Applying filters:', { dateFilter, typeFilter, statusFilter });
+                
+                closeFilterModal();
+                alert('✅ Filters Applied!\n\nDate: ' + dateFilter + '\nType: ' + typeFilter + '\nStatus: ' + statusFilter + '\n\nShowing filtered transactions...');
+            }, 800);
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('filterModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeFilterModal();
+            }
+        });
+
+        // Bottom navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Initial load animation
+        window.addEventListener('load', function() {
+            const cards = document.querySelectorAll('.transaction-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + F to open search
+            if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                e.preventDefault();
+                toggleSearch();
+            }
+            // Escape to close search or modals
+            if (e.key === 'Escape') {
+                const searchContainer = document.getElementById('searchContainer');
+                const filterModal = document.getElementById('filterModal');
+                
+                if (searchContainer.classList.contains('show')) {
+                    toggleSearch();
+                } else if (filterModal.classList.contains('show')) {
+                    closeFilterModal();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

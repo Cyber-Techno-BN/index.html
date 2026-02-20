@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Play - User Profile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(180deg, #0a1628 0%, #162447 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: linear-gradient(180deg, #0d1b2a 0%, #1b263b 100%);
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 100px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(180deg, #0a1628 0%, #162447 100%);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-img {
+            height: 45px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .logo-text {
+            color: white;
+            font-weight: bold;
+            font-size: 22px;
+        }
+
+        .customer-service-btn {
+            background: rgba(255, 165, 0, 0.15);
+            border: 2px solid #ffa500;
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .customer-service-btn:hover {
+            background: rgba(255, 165, 0, 0.25);
+            transform: scale(1.05);
+        }
+
+        .customer-service-icon {
+            font-size: 22px;
+        }
+
+        /* Profile Section */
+        .profile-section {
+            padding: 20px 15px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+            margin: 15px;
+            border-radius: 12px;
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .avatar-icon {
+            font-size: 45px;
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            color: #ffa500;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .profile-detail {
+            color: white;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .profile-label {
+            color: #94a3b8;
+            display: inline-block;
+            min-width: 90px;
+        }
+
+        /* Menu Options Section */
+        .menu-section {
+            padding: 0 15px 20px;
+        }
+
+        .menu-item {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .menu-item:hover {
+            transform: translateX(5px);
+            background: linear-gradient(135deg, #2c5282 0%, #3b6fa8 100%);
+            border-color: rgba(255, 165, 0, 0.5);
+        }
+
+        .menu-item:active {
+            transform: translateX(3px);
+        }
+
+        .menu-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .menu-text {
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            flex: 1;
+        }
+
+        .menu-arrow {
+            color: #94a3b8;
+            font-size: 18px;
+        }
+
+        /* Remove underline from links */
+        a {
+            text-decoration: none;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 480px;
+            width: 100%;
+            background: linear-gradient(180deg, #0a1628 0%, #000000 100%);
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            border-top: 2px solid rgba(255, 165, 0, 0.3);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 5px 15px;
+        }
+
+        .nav-item.active {
+            color: #ffa500;
+        }
+
+        .nav-item:hover {
+            color: #ffa500;
+            transform: translateY(-2px);
+        }
+
+        .nav-icon {
+            font-size: 24px;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 165, 0, 0.5);
+            z-index: 2000;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from { 
+                transform: translateX(-50%) translateY(-100px); 
+                opacity: 0; 
+            }
+            to { 
+                transform: translateX(-50%) translateY(0); 
+                opacity: 1; 
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header with Logo and Customer Service -->
+        <div class="header">
+            <div class="logo-container">
+                <img src="quickplay logo.jpeg" alt="Quick Play" class="logo-img"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div class="logo-text" style="display:none;">Quick PLAY</div>
+            </div>
+            
+           <a href="chatbot.html" class="customer-service-btn">
+    <span class="customer-service-icon">🎧</span>
+</a>
+        </div>
+
+        <!-- Profile Section -->
+        <div class="profile-section">
+            <div class="profile-avatar">
+                <span class="avatar-icon">👨</span>
+            </div>
+            <div class="profile-info">
+                <div class="profile-name">Shade</div>
+                <div class="profile-detail">
+                    <span class="profile-label">ID:</span>112232
+                </div>
+                <div class="profile-detail">
+                    <span class="profile-label">user name:</span>shadestumu
+                </div>
+                <div class="profile-detail">
+                    <span class="profile-label">password:</span>shade2661
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu Options -->
+        <div class="menu-section">
+            <!-- Withdraw -->
+            <div class="menu-item" onclick="goToWithdraw()">
+                <div class="menu-icon">💸</div>
+                <div class="menu-text">Withdraw</div>
+                <div class="menu-arrow">›</div>
+            </div>
+
+            <!-- Deposit -->
+            <div class="menu-item" onclick="goToDeposit()">
+                <div class="menu-icon">💰</div>
+                <div class="menu-text">Deposit</div>
+                <div class="menu-arrow">›</div>
+            </div>
+
+            <!-- Transaction -->
+            <a href="Transaction1.html" class="menu-item">
+                <div class="menu-icon">🪙</div>
+                <div class="menu-text">Transaction</div>
+                <div class="menu-arrow">›</div>
+            </a>
+
+            <!-- Referrals -->
+            <a href="referral.html" class="menu-item">
+                <div class="menu-icon">👥</div>
+                <div class="menu-text">Referrals</div>
+                <div class="menu-arrow">›</div>
+            </a>
+
+            <!-- Help & Security -->
+             <a href="chatbot.html" class="menu-item">
+                <div class="menu-icon">❓</div>
+                <div class="menu-text">Help & Security</div>
+                <div class="menu-arrow">›</div>
+            </a>
+            <!-- Account Security -->
+          <a href="Account and security.html" class="menu-item">
+                <div class="menu-icon">🛡️</div>
+                <div class="menu-text">Account Security</div>
+                <div class="menu-arrow">›</div>
+         </a>
+          <!-- Setting -->
+<a href="setting.html" class="menu-item">
+    <div class="menu-icon">⚙️</div>
+    <div class="menu-text">Setting</div>
+    <div class="menu-arrow">›</div>
+</a>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="games.html" class="nav-item">
+                <div class="nav-icon">🎮</div>
+                <div class="nav-label">Games</div>
+            </a>
+
+            <a href="promotion.html" class="nav-item">
+                <div class="nav-icon">📢</div>
+                <div class="nav-label">Promotion</div>
+            </a>
+
+            <a href="wallet.html" class="nav-item">
+                <div class="nav-icon">💰</div>
+                <div class="nav-label">Wallet</div>
+            </a>
+
+            <a href="user.html" class="nav-item active">
+                <div class="nav-icon">👤</div>
+                <div class="nav-label">User</div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Show toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Customer Service
+        function openCustomerService() {
+            showToast('🎧 Opening Customer Service...');
+            // window.location.href = 'customer-service.html';
+        }
+
+        // Menu Navigation Functions
+        function goToWithdraw() {
+            showToast('💸 Opening Withdraw page...');
+            // window.location.href = 'withdraw.html';
+        }
+
+        function goToDeposit() {
+            showToast('💰 Opening Deposit page...');
+            // window.location.href = 'deposit.html';
+        }
+
+        function goToTransaction() {
+            showToast('🪙 Opening Transaction history...');
+            // window.location.href = 'transaction.html';
+        }
+
+        function goToReferrals() {
+            showToast('👥 Opening Referrals page...');
+            // window.location.href = 'referrals.html';
+        }
+
+        function goToHelpSecurity() {
+            showToast('❓ Opening Help & Security...');
+            // window.location.href = 'help-security.html';
+        }
+
+        function goToAccountSecurity() {
+            showToast('🛡️ Opening Account Security...');
+            // window.location.href = 'account-security.html';
+        }
+
+        function goToSettings() {
+            showToast('⚙️ Opening Settings...');
+            // window.location.href = 'settings.html';
+        }
+
+        // Bottom Navigation
+        function goToPage(page) {
+            if (page === 'games') {
+                window.location.href = 'index.html';
+            } else if (page === 'promotion') {
+                window.location.href = 'promotion.html';
+            } else if (page === 'wallet') {
+                window.location.href = 'wallet.html';
+            }
+        }
+
+        // Bottom navigation active state
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
